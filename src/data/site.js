@@ -1,11 +1,11 @@
 // Site ayarları. Sipariş kanalları ve satıcı bilgileri buradan değişir; boş bırakılan alan sitede görünmez.
 export const site = {
-  ad: 'Liman',
+  ad: 'Savana Season',
   alt: 'beton objeler',
-  baslik: 'Liman · beton objeler',
+  baslik: 'Savana Season · beton objeler',
   aciklama:
-    'Dalgakıranlardan, iskele babalarından ve silolardan doğan beton objeler. Beyaz çimentoyla, siparişle elde dökülür.',
-  url: 'https://pbyloyth.github.io/liman-koleksiyonu',
+    'Elde dökülen beton objeler. Katedral ve Liman koleksiyonları; yedi yüzey, siparişle dökülür.',
+  url: 'https://pbyloyth.github.io/savana-season',
 
   // Sipariş penceresindeki düğmeler. Doldurulan her kanal bir düğme olur.
   siparis: {

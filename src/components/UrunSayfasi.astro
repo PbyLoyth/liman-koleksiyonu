@@ -14,7 +14,7 @@ interface Props { u: any; secili: string; }
 const { u, secili } = Astro.props;
 const Y = yuzeyBul(secili);
 
-const baslik = secili === 'tuz' ? `${u.ad} · ${u.rol} — Liman` : `${u.ad} · ${yuzeyAdi(Y, u)} — Liman`;
+const baslik = secili === 'tuz' ? `${u.ad} · ${u.rol} — Savana Season` : `${u.ad} · ${yuzeyAdi(Y, u)} — Savana Season`;
 const aciklama = `${u.rol}. ${u.kaynak}`;
 const og = await getImage({ src: urunGorseli(u.slug, secili, 'aci'), width: 1200, format: 'jpg' });
 
@@ -30,15 +30,15 @@ for (const y of yuzeyler) {
   };
 }
 
-const sira = urunler.filter((d) => !d.yakinda);
-const i = Math.max(0, sira.findIndex((d) => d.slug === u.slug));
-const digerleri = [1, 2, 3].map((n) => sira[(i + n) % sira.length]).filter((d) => d.slug !== u.slug).slice(0, 3);
+// Diğer parçalar: önce aynı koleksiyondan, sonra öbüründen; toplam üç
+const sira = urunler.filter((d) => !d.yakinda && d.slug !== u.slug);
+const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira.filter((d) => d.koleksiyon !== u.koleksiyon)].slice(0, 3);
 ---
 <Base baslik={baslik} aciklama={aciklama} gorsel={og.src}>
   <div class="urun" data-urun data-secili={secili}>
     <div class="kap">
       <nav class="kirinti" aria-label="Konum">
-        <a href={`${yol('')}#urunler`}>Ürünler</a>
+        <a href={`${yol('')}#${u.koleksiyon}`}>{u.koleksiyon === 'katedral' ? 'Katedral' : 'Liman'}</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{u.ad}</span>
       </nav>
@@ -57,7 +57,7 @@ const digerleri = [1, 2, 3].map((n) => sira[(i + n) % sira.length]).filter((d) =
                       src={c.img}
                       quality={74} widths={[640, 960, 1280, 1600]}
                       sizes="(min-width: 960px) 56vw, 100vw"
-                      alt={`${u.ad}, ${yuzeyAdi(y, u)} yüzey, ${cekimAdi[c.cekim]}`}
+                      alt={c.cekim === 'kullanim' ? `${u.ad}, kullanımda` : `${u.ad}, ${yuzeyAdi(y, u)} yüzey, ${cekimAdi[c.cekim]}`}
                       loading={y.id === secili && n === 0 ? 'eager' : 'lazy'}
                       fetchpriority={y.id === secili && n === 0 ? 'high' : 'auto'}
                     />
@@ -77,6 +77,7 @@ const digerleri = [1, 2, 3].map((n) => sira[(i + n) % sira.length]).filter((d) =
       <div class="bilgi">
         <div class="bilgi-yapiskan">
           {u.yakinda && <span class="rozet">Yakında</span>}
+          <p class="ust-baslik">{u.koleksiyon === 'katedral' ? 'Katedral' : 'Liman'} koleksiyonu</p>
           <h1>{u.ad}</h1>
           <p class="bilgi-rol">{u.rol}</p>
           <p class="bilgi-fiyat">{tl(u.fiyat)}</p>
@@ -171,7 +172,7 @@ const digerleri = [1, 2, 3].map((n) => sira[(i + n) % sira.length]).filter((d) =
     adEl.textContent = y.ad;
     kisaEl.textContent = y.kisa;
     cubukYuzey.textContent = y.ad;
-    document.title = id === 'tuz' ? `${veri.ad} · ${veri.rol} — Liman` : `${veri.ad} · ${y.ad} — Liman`;
+    document.title = id === 'tuz' ? `${veri.ad} · ${veri.rol} — Savana Season` : `${veri.ad} · ${y.ad} — Savana Season`;
     history.replaceState(null, '', y.yol);
     const serit = kok.querySelector<HTMLElement>(`[data-set="${id}"] .galeri-serit`);
     if (serit) serit.scrollLeft = 0;

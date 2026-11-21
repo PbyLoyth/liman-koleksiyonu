@@ -1,8 +1,8 @@
-# Liman · beton objeler
+# Savana Season · beton objeler
 
 Liman Koleksiyonu'nun satış sitesi. Yedi parça, altı yüzey; her ürünün ve her yüzeyin kendi sayfası var (paylaşılan bağlantı o yüzeyin görseliyle açılır).
 
-Canlı: https://pbyloyth.github.io/liman-koleksiyonu/
+Canlı: https://pbyloyth.github.io/savana-season/
 
 ## Sık değişenler
 
@@ -16,7 +16,7 @@ Canlı: https://pbyloyth.github.io/liman-koleksiyonu/
 
 ```
 npm install
-npm run dev        # http://localhost:4341/liman-koleksiyonu/
+npm run dev        # http://localhost:4341/savana-season/
 npm run gorseller  # render klasörlerinden src/assets görsellerini yeniden üretir
 npm run yayinla    # kurar ve gh-pages dalına gönderir (site birkaç dakikada güncellenir)
 ```

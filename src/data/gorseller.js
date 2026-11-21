@@ -5,13 +5,16 @@ const kol = import.meta.glob('../assets/koleksiyon/*.jpg', { eager: true, import
 export const urunGorseli = (slug, yuzey, cekim) =>
   urun[`../assets/urun/${slug}/${yuzey}-${cekim}.jpg`] ?? urun[`../assets/urun/${slug}/tuz-${cekim}.jpg`];
 
-export const cekimler = (u, yuzey) =>
-  [...u.gorsel, ...((u.ek && u.ek[yuzey]) || [])]
-    .map((cekim) => ({ cekim, img: urunGorseli(u.slug, yuzey, cekim) }))
-    .filter((x) => x.img);
+export const kullanimGorseli = (slug) => urun[`../assets/urun/${slug}/kullanim.jpg`];
 
-export const koleksiyonGorseli = (yuzey) => kol[`../assets/koleksiyon/${yuzey}.jpg`] ?? kol['../assets/koleksiyon/tuz.jpg'];
-export const kapakGorseli = () => kol['../assets/koleksiyon/kapak.jpg'];
-export const kapakGenis = () => kol['../assets/koleksiyon/kapak-genis.jpg'];
+// Yüzeye özgü çekimler, ardından (varsa) bütün yüzeylerde ortak kullanım görseli
+export const cekimler = (u, yuzey) => {
+  const liste = u.gorsel.map((cekim) => ({ cekim, img: urunGorseli(u.slug, yuzey, cekim) })).filter((x) => x.img);
+  const k = kullanimGorseli(u.slug);
+  if (k) liste.push({ cekim: 'kullanim', img: k });
+  return liste;
+};
+
+export const koleksiyonGorseli = (ad) => kol[`../assets/koleksiyon/${ad}.jpg`] ?? kol['../assets/koleksiyon/tuz.jpg'];
 
 export const cekimAdi = { aci: 'açıdan', ust: 'üstten', kullanim: 'kullanımda' };

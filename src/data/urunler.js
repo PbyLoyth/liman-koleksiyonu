@@ -1,9 +1,106 @@
 // Ürünler. Ölçü ve ağırlıklar 3D modelden (beyaz beton, 2,25 g/cm³). Fiyatlar TL.
-// gorsel: her yüzey için sırayla gösterilen çekimler; ek: yalnız belirli yüzeyde olan çekimler.
+// gorsel: her yüzey için gösterilen çekimler; kullanım görseli (varsa) bütün yüzeylerin galerisine eklenir.
+export const koleksiyonlar = [
+  {
+    id: 'katedral',
+    ad: 'Katedral',
+    alt: 'Gotik yapının parçaları: payanda, şapel, sivri kemer, demet ayak, gül pencere.',
+  },
+  {
+    id: 'liman',
+    ad: 'Liman',
+    alt: 'Limanın beton yapıları: dalgakıran, keson, iskele babası, silo, rıhtım.',
+  },
+];
+
 export const urunler = [
+  // ---------------------------------------------------------------- Katedral
+  {
+    slug: 'payanda',
+    koleksiyon: 'katedral',
+    ad: 'Payanda',
+    rol: 'Şarap tutucu',
+    fiyat: 1650,
+    kaynak: 'Uçan payanda, katedralin duvarını dışarıdan tutan kemerli destektir.',
+    metin: 'Şişe kirişin sırtındaki beşiğe yatar; dibi beşiğin ucuna, boynu kulenin çentiğine oturur.',
+    imza: { ad: 'Kömür', neden: 'Katedral taşının isli rengi' },
+    ozellik: [
+      ['Ölçü', '252 × 72 × 155 mm'],
+      ['Ağırlık', 'Yaklaşık 2,05 kg'],
+      ['Şişe', '75 cl, Ø90 mm’ye kadar'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'sapel',
+    koleksiyon: 'katedral',
+    ad: 'Şapel',
+    rol: 'Mum feneri',
+    fiyat: 950,
+    kaynak: 'Şapel, katedralin içindeki küçük ibadet odasıdır.',
+    metin: 'Tealight’ın üstüne kapatılır; ışık iki sivri pencereden ve gözden dışarı süzülür. Tepedeki baca ısıyı atar.',
+    imza: { ad: 'Liman Grisi', neden: 'Taş şapelin grisi' },
+    ozellik: [
+      ['Ölçü', '96 × 96 × 142 mm'],
+      ['Ağırlık', 'Yaklaşık 740 g'],
+      ['Mum', 'Tealight, Ø38 mm'],
+    ],
+    uyari: 'Yanan mumu yalnız bırakmayın; fener ısınır.',
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'kemer',
+    koleksiyon: 'katedral',
+    ad: 'Kemer',
+    rol: 'Kitap desteği, çift',
+    fiyat: 1550,
+    kaynak: 'Sivri kemer gotik yapının imzasıdır: iki yay yükü ortada buluşturur.',
+    metin: 'Her destek kemerin bir yarısı. Kitaplar aralarına girince kemer tamamlanır.',
+    imza: { ad: 'Gece Mavisi', neden: 'Vitray gecesinin mavisi' },
+    ozellik: [
+      ['Ölçü', '110 × 52 × 170 mm (tanesi)'],
+      ['Ağırlık', 'Tanesi yaklaşık 1,16 kg'],
+      ['Takım', '2 adet'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'demet',
+    koleksiyon: 'katedral',
+    ad: 'Demet',
+    rol: 'Vazo',
+    fiyat: 890,
+    kaynak: 'Demet ayak, ince sütunların birleşip tek ayak olduğu gotik taşıyıcıdır.',
+    metin: 'İçindeki cam tüp suyu tutar; beton suya değmez. Kuru ya da taze dal için.',
+    imza: { ad: 'Yosun', neden: 'Eski taşı saran yosun' },
+    ozellik: [
+      ['Ölçü', 'Ø76 × 210 mm'],
+      ['Ağırlık', 'Yaklaşık 880 g'],
+      ['Cam tüp', 'Ø25 mm, çıkarılabilir'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'gul',
+    koleksiyon: 'katedral',
+    ad: 'Gül',
+    rol: 'Takı tabağı',
+    fiyat: 490,
+    kaynak: 'Gül pencere, katedral cephesindeki yuvarlak vitraydır.',
+    metin: 'Tabanında pencerenin kurşun çizgileri derz olarak durur. Yüzük, küpe ve küçük eşyalar için.',
+    imza: { ad: 'Pas', neden: 'Gül pencerenin kızıllığı' },
+    ozellik: [
+      ['Ölçü', 'Ø130 × 18 mm'],
+      ['Ağırlık', 'Yaklaşık 335 g'],
+      ['Altında', 'Keçe'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  // ---------------------------------------------------------------- Liman
   {
     slug: 'keson',
-    ad: 'KESON',
+    koleksiyon: 'liman',
+    ad: 'Keson',
     rol: 'Valet tepsisi',
     fiyat: 1250,
     kaynak: 'Keson, dalgakıranın içi hücreli beton kutusudur. Suyun altında durur, üstündeki duvar dalgayı geri çevirir.',
@@ -16,11 +113,11 @@ export const urunler = [
       ['Altında', 'Keçe'],
     ],
     gorsel: ['aci', 'ust'],
-    ek: { tuz: ['kullanim'] },
   },
   {
     slug: 'dalgakiran',
-    ad: 'DALGAKIRAN',
+    koleksiyon: 'liman',
+    ad: 'Dalgakıran',
     rol: 'Kitap desteği, çift',
     fiyat: 1450,
     kaynak: 'Dört bacaklı dalgakıran bloğu. Üç bacağının üstünde durur, dördüncüsü yukarı bakar.',
@@ -35,7 +132,8 @@ export const urunler = [
   },
   {
     slug: 'baba',
-    ad: 'BABA',
+    koleksiyon: 'liman',
+    ad: 'Baba',
     rol: 'Şamdan, iki boy',
     fiyat: 690,
     kaynak: 'İskele babası, gemi halatının sarıldığı mantar başlı direktir.',
@@ -51,7 +149,8 @@ export const urunler = [
   },
   {
     slug: 'silo',
-    ad: 'SİLO',
+    koleksiyon: 'liman',
+    ad: 'Silo',
     rol: 'Kalemlik',
     fiyat: 890,
     kaynak: 'Liman siloları yan yana kaynaşmış silindirlerdir.',
@@ -66,7 +165,8 @@ export const urunler = [
   },
   {
     slug: 'rihtim',
-    ad: 'RIHTIM',
+    koleksiyon: 'liman',
+    ad: 'Rıhtım',
     rol: 'Tütsülük',
     fiyat: 490,
     kaynak: 'Rıhtım, gemilerin yanaştığı duvardır; üstünde küçük bir baba durur.',
@@ -83,7 +183,8 @@ export const urunler = [
   },
   {
     slug: 'antifer',
-    ad: 'ANTİFER',
+    koleksiyon: 'liman',
+    ad: 'Antifer',
     rol: 'Kâğıt ağırlığı',
     fiyat: 450,
     kaynak: 'Antifer, dört yüzü oluklu dalgakıran küpüdür; adını Fransa’daki Antifer limanından alır.',
@@ -98,7 +199,8 @@ export const urunler = [
   },
   {
     slug: 'fener',
-    ad: 'FENER',
+    koleksiyon: 'liman',
+    ad: 'Fener',
     rol: 'Masa lambası',
     fiyat: 2900,
     yakinda: true,

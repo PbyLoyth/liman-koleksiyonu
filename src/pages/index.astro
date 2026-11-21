@@ -3,39 +3,38 @@ import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import UrunKart from '../components/UrunKart.astro';
 import Ornek from '../components/Ornek.astro';
-import { urunler } from '../data/urunler.js';
+import { urunler, koleksiyonlar } from '../data/urunler.js';
 import { yuzeyler } from '../data/yuzeyler.js';
-import { koleksiyonGorseli, kapakGorseli, kapakGenis, urunGorseli } from '../data/gorseller.js';
+import { koleksiyonGorseli, urunGorseli, kullanimGorseli } from '../data/gorseller.js';
 import { yol, urunYolu } from '../data/yol.js';
 
-const satista = urunler.filter((u) => !u.yakinda);
-const yakinda = urunler.filter((u) => u.yakinda);
-// Kapak: telefonda 5:4, genişte 2:1 çekim (yanlarda daha çok zemin)
-const darKapak = await getImage({ src: kapakGorseli(), widths: [640, 960, 1280], format: 'webp', quality: 74 });
-const genisKapak = kapakGenis() ? await getImage({ src: kapakGenis(), widths: [1280, 1920, 2560], format: 'webp', quality: 74 }) : null;
+// Kapak: telefonda 5:4, genişte 2:1 (Katedral serimi, Grafit, kara mermer)
+const darKapak = await getImage({ src: koleksiyonGorseli('kapak'), widths: [640, 960, 1280], format: 'webp', quality: 74 });
+const genisKapak = await getImage({ src: koleksiyonGorseli('kapak-genis'), widths: [1280, 1920, 2560], format: 'webp', quality: 74 });
+const hikayeGorseli = kullanimGorseli('sapel') ?? urunGorseli('keson', 'tuz', 'aci');
 ---
 <Base>
   <section class="kapak">
     <div class="kap kapak-metin">
-      <p class="ust-baslik">Liman Koleksiyonu</p>
-      <h1>Limandan masaya.</h1>
-      <p class="kapak-alt">Dalgakıranlardan, iskele babalarından ve silolardan doğan beton objeler.</p>
+      <p class="ust-baslik">beton objeler</p>
+      <h1 class="fraktur">Savana Season</h1>
+      <p class="kapak-alt">Elde dökülen beton objeler. İki koleksiyon: Katedral ve Liman.</p>
       <div class="eylem">
-        <a class="dugme" href="#urunler">Ürünlere bak</a>
-        <a class="bag" href="#hikaye">Hikâyesi <span aria-hidden="true">›</span></a>
+        <a class="dugme" href="#koleksiyonlar">Koleksiyonlar</a>
+        <a class="bag" href="#hikaye">Hikâye <span aria-hidden="true">›</span></a>
       </div>
     </div>
     <div class="kap kap-genis">
       <picture>
-        {genisKapak && <source media="(min-width: 700px)" srcset={genisKapak.srcSet.attribute} sizes="(min-width: 1440px) 1360px, 100vw" />}
+        <source media="(min-width: 700px)" srcset={genisKapak.srcSet.attribute} sizes="(min-width: 1440px) 1360px, 100vw" />
         <img
-          class:list={['kapak-gorsel', genisKapak && 'kapak-iki']}
+          class="kapak-gorsel kapak-iki"
           src={darKapak.src}
           srcset={darKapak.srcSet.attribute}
           sizes="100vw"
           width="1600"
           height="1280"
-          alt="Koleksiyonun yedi parçası kaba beton zemin üzerinde, üstten: tepsi, lamba, kalemlik, iki kitap desteği, iki şamdan, kâğıt ağırlığı ve tütsülük"
+          alt="Katedral koleksiyonu Grafit yüzeyle kara mermer üzerinde: kemer çifti, şarap tutucu, mum feneri, vazo ve takı tabağı"
           loading="eager"
           fetchpriority="high"
           decoding="async"
@@ -44,51 +43,63 @@ const genisKapak = kapakGenis() ? await getImage({ src: kapakGenis(), widths: [1
     </div>
   </section>
 
-  <section id="urunler" class="bolum">
-    <div class="kap">
-      <div class="bolum-bas">
-        <h2>Ürünler</h2>
-        <p>Her parça limandaki bir yapıdan.</p>
-      </div>
-      <div class="izgara">
-        {satista.map((u) => <UrunKart u={u} />)}
-      </div>
-      {yakinda.map((u) => (
-        <a class="yakinda" href={urunYolu(u.slug)}>
-          <div class="yakinda-metin">
-            <span class="rozet">Yakında</span>
-            <h3>{u.ad}</h3>
-            <p class="yakinda-rol">{u.rol}</p>
-            <p>{u.metin}</p>
-            <span class="bag">İncele <span aria-hidden="true">›</span></span>
+  <div id="koleksiyonlar">
+    {koleksiyonlar.map((k) => {
+      const satista = urunler.filter((u) => u.koleksiyon === k.id && !u.yakinda);
+      const yakinda = urunler.filter((u) => u.koleksiyon === k.id && u.yakinda);
+      return (
+        <section id={k.id} class="bolum">
+          <div class="kap">
+            <div class="bolum-bas">
+              <p class="ust-baslik">Koleksiyon</p>
+              <h2>{k.ad}</h2>
+              <p>{k.alt}</p>
+            </div>
+            <div class="izgara">
+              {satista.map((u) => <UrunKart u={u} />)}
+            </div>
+            {yakinda.map((u) => (
+              <a class="yakinda" href={urunYolu(u.slug)}>
+                <div class="yakinda-metin">
+                  <span class="rozet">Yakında</span>
+                  <h3>{u.ad}</h3>
+                  <p class="yakinda-rol">{u.rol}</p>
+                  <p>{u.metin}</p>
+                  <span class="bag">İncele <span aria-hidden="true">›</span></span>
+                </div>
+                <Image
+                  class="yakinda-gorsel"
+                  src={kullanimGorseli(u.slug) ?? urunGorseli(u.slug, 'renk', 'aci')}
+                  quality={74}
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 900px) 36vw, 100vw"
+                  alt={`${u.ad} masa lambası, gece yanarken`}
+                  loading="lazy"
+                />
+              </a>
+            ))}
           </div>
-          <Image
-            class="yakinda-gorsel"
-            src={urunGorseli(u.slug, 'renk', 'aci')}
-            quality={74} widths={[480, 720, 960]}
-            sizes="(min-width: 900px) 36vw, 100vw"
-            alt={`${u.ad} masa lambası, açıdan`}
-            loading="lazy"
-          />
-        </a>
-      ))}
-    </div>
-  </section>
+        </section>
+      );
+    })}
+  </div>
 
   <section id="yuzeyler" class="bolum yuzey-bolum">
     <div class="kap">
       <div class="bolum-bas">
-        <h2>Altı yüzey</h2>
-        <p>Her parça altı yüzeyle dökülür. Sıçramalar elde atılır; her parçada başka yere düşer.</p>
+        <p class="ust-baslik">Her parça için</p>
+        <h2>Yedi yüzey</h2>
+        <p>Kalıp aynı, yüzey değişir. Sıçramalar elde atılır; her parçada başka yere düşer.</p>
       </div>
       <div class="yz-sahne" data-yz-sahne>
         {yuzeyler.map((y, i) => (
           <Image
             class:list={['yz-gorsel', i === 0 && 'etkin']}
             src={koleksiyonGorseli(y.id)}
-            quality={74} widths={[960, 1440, 2000]}
+            quality={74}
+            widths={[960, 1440, 2000]}
             sizes="(min-width: 1240px) 1180px, 100vw"
-            alt={`Koleksiyon, ${y.ad} yüzeyle`}
+            alt={`Liman koleksiyonu, ${y.ad} yüzeyle`}
             loading="lazy"
             hidden={i !== 0}
             data-yz={y.id}
@@ -118,17 +129,19 @@ const genisKapak = kapakGenis() ? await getImage({ src: kapakGenis(), widths: [1
   <section id="hikaye" class="bolum hikaye">
     <div class="kap hikaye-ic">
       <div class="hikaye-metin">
-        <h2>Limanda süs yok.</h2>
-        <p>Her yapının bir işi var. Dalgakıran bloğu dalgayı kırar, baba halatı tutar, keson suyun altında yükü taşır. Biçim işten gelir.</p>
-        <p>Bu koleksiyon o yapıları masaya küçültüyor ve onlara yeni bir iş veriyor: dalgakıran kitap tutuyor, baba mum, keson anahtar.</p>
-        <p>Her parça beyaz çimentoyla elde dökülür. Yüzeydeki ince çizgiler kalıpta oluşur ve harçla tek tek doldurulur, karo derzi gibi.</p>
+        <p class="ust-baslik">Hikâye</p>
+        <h2>Taş, iş ve ışık.</h2>
+        <p>Limanda her yapının bir işi var: dalgakıran dalgayı kırar, baba halatı tutar. Katedralde taş ışığa yol açar: kemer yükü taşır, payanda duvarı tutar, gül pencere ışığı süzer.</p>
+        <p>Savana Season bu yapıları masaya küçültüp onlara yeni bir iş veriyor. Payanda şarabı tutuyor, şapel mumu, kemer kitabı.</p>
+        <p>Her parça beyaz çimentoyla elde dökülür. Yüzeydeki çizgiler kalıpta oluşur ve harçla tek tek doldurulur.</p>
       </div>
       <Image
-        class="hikaye-gorsel"
-        src={urunGorseli('keson', 'tuz', 'kullanim')}
-        quality={74} widths={[480, 720, 960, 1280]}
+        class="hikaye-gorsel kemer-maske"
+        src={hikayeGorseli}
+        quality={74}
+        widths={[480, 720, 960, 1280]}
         sizes="(min-width: 900px) 44vw, 100vw"
-        alt="KESON kullanımda, üstten: telefon, kulaklık kutusu, yüzük ve bozuk para hücrelerinde"
+        alt="Şapel mum feneri gece yanarken: ışık sivri pencerelerden süzülüyor"
         loading="lazy"
       />
     </div>
@@ -137,8 +150,8 @@ const genisKapak = kapakGenis() ? await getImage({ src: kapakGenis(), widths: [1
   <section id="nasil" class="bolum">
     <div class="kap">
       <div class="bolum-bas">
-        <h2>Sipariş</h2>
-        <p>Üç adımda.</p>
+        <p class="ust-baslik">Sipariş</p>
+        <h2>Üç adımda</h2>
       </div>
       <ol class="adimlar">
         <li><span class="adim-no">1</span><h3>Seç</h3><p>Parçayı ve yüzeyini seç.</p></li>
@@ -154,7 +167,7 @@ const genisKapak = kapakGenis() ? await getImage({ src: kapakGenis(), widths: [1
 </Base>
 
 <script>
-  // Altı yüzey: sekme seçimi koleksiyon görselini yumuşak geçişle değiştirir
+  // Yedi yüzey: sekme seçimi koleksiyon görselini yumuşak geçişle değiştirir
   const sahne = document.querySelector<HTMLElement>('[data-yz-sahne]');
   const metin = document.querySelector<HTMLElement>('[data-yz-metin]');
   const dugmeler = [...document.querySelectorAll<HTMLButtonElement>('.yz-dugme')];

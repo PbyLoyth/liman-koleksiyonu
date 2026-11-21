@@ -6,6 +6,7 @@ export const palet = {
   Pas: '#9A5A36',
   Kömür: '#3A3C3B',
   'Gece Mavisi': '#34465A',
+  Grafit: '#55585A',
 };
 
 export const yuzeyler = [
@@ -14,6 +15,12 @@ export const yuzeyler = [
     ad: 'Tuz',
     kisa: 'Beyaz beton, koyu derz',
     metin: 'Koleksiyonun ilk hâli: beyaz beton, ince koyu derzler.',
+  },
+  {
+    id: 'grafit',
+    ad: 'Grafit',
+    kisa: 'Koyu, lüks gri beton',
+    metin: 'Koyu, lüks gri beton: sıkı yüzey, hafif ipek parlaklık, ton ton derz.',
   },
   {
     id: 'tuz-biber',
