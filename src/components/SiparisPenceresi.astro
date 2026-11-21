@@ -1,0 +1,40 @@
+---
+import { site, siparisAcik } from '../data/site.js';
+interface Props { ad: string; fiyat: string; yakinda?: boolean; }
+const { ad, fiyat, yakinda = false } = Astro.props;
+const k = site.siparis;
+---
+<dialog class="siparis" data-siparis aria-labelledby="sp-baslik">
+  <div class="sp-ic">
+    <div class="sp-ust">
+      <h2 id="sp-baslik">{yakinda ? 'Çıkınca haber ver' : 'Sipariş'}</h2>
+      <form method="dialog"><button class="sp-kapat" aria-label="Kapat">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+      </button></form>
+    </div>
+    <div class="sp-ozet">
+      <img data-sp-img src="" alt="" width="64" height="80" />
+      <div>
+        <strong>{ad}</strong>
+        <span data-sp-yuzey></span>
+        <span class="sp-fiyat">{fiyat}</span>
+      </div>
+    </div>
+    <label class="sp-etiket" for="sp-mesaj">Mesajın</label>
+    <textarea id="sp-mesaj" rows="4" readonly data-sp-mesaj></textarea>
+    <div class="sp-dugmeler">
+      {k.whatsapp && <a class="dugme" data-kanal="whatsapp" href="#" target="_blank" rel="noopener">WhatsApp ile gönder</a>}
+      {k.instagram && <a class="dugme ikincil" data-kanal="instagram" href="#" target="_blank" rel="noopener">Instagram’dan yaz</a>}
+      {k.eposta && <a class="dugme ikincil" data-kanal="eposta" href="#">E-posta gönder</a>}
+      <button class={siparisAcik ? 'dugme ikincil' : 'dugme'} type="button" data-kopyala>Mesajı kopyala</button>
+    </div>
+    <p class="sp-durum" aria-live="polite" data-sp-durum></p>
+    {!siparisAcik && <p class="sp-not">Sipariş kanalımız çok yakında burada olacak. Şimdilik mesajı kopyalayabilirsin.</p>}
+    {k.instagram && <p class="sp-not">Instagram’da mesaj önceden yazılamıyor; düğme mesajı kopyalar, sohbete yapıştırman yeter.</p>}
+    <p class="sp-kucuk">
+      {yakinda
+        ? 'Satışa çıktığında haber veririz.'
+        : 'Her parça siparişle dökülür. Teslim süresini ve kargoyu mesajda netleştiririz. Teslimden sonra 14 gün içinde iade edebilirsin; iade kargosu bizden.'}
+    </p>
+  </div>
+</dialog>

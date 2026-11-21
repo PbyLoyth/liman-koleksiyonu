@@ -1,0 +1,123 @@
+// Ürünler. Ölçü ve ağırlıklar 3D modelden (beyaz beton, 2,25 g/cm³). Fiyatlar TL.
+// gorsel: her yüzey için sırayla gösterilen çekimler; ek: yalnız belirli yüzeyde olan çekimler.
+export const urunler = [
+  {
+    slug: 'keson',
+    ad: 'KESON',
+    rol: 'Valet tepsisi',
+    fiyat: 1250,
+    kaynak: 'Keson, dalgakıranın içi hücreli beton kutusudur. Suyun altında durur, üstündeki duvar dalgayı geri çevirir.',
+    metin: 'Telefon, kulaklık kutusu, yüzük ve bozuk para için hücreleri var. Arkadaki duvar telefona yaslanma yeri.',
+    imza: { ad: 'Gece Mavisi', neden: 'Kesonun durduğu derin su' },
+    ozellik: [
+      ['Ölçü', '260 × 130 × 44 mm'],
+      ['Ağırlık', 'Yaklaşık 1,25 kg'],
+      ['Hücreler', 'Telefon (168 × 106 mm), kulaklık kutusu, yüzük ve bozuk para'],
+      ['Altında', 'Keçe'],
+    ],
+    gorsel: ['aci', 'ust'],
+    ek: { tuz: ['kullanim'] },
+  },
+  {
+    slug: 'dalgakiran',
+    ad: 'DALGAKIRAN',
+    rol: 'Kitap desteği, çift',
+    fiyat: 1450,
+    kaynak: 'Dört bacaklı dalgakıran bloğu. Üç bacağının üstünde durur, dördüncüsü yukarı bakar.',
+    metin: 'Kitaplar dik bacağa yaslanır. Çift olarak gelir; tek başına da masada güzel durur.',
+    imza: { ad: 'Liman Grisi', neden: 'Dalgakıran bloklarının betonu' },
+    ozellik: [
+      ['Ölçü', '156 × 138 × 125 mm'],
+      ['Ağırlık', 'Tanesi yaklaşık 780 g'],
+      ['Takım', '2 adet'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'baba',
+    ad: 'BABA',
+    rol: 'Şamdan, iki boy',
+    fiyat: 690,
+    kaynak: 'İskele babası, gemi halatının sarıldığı mantar başlı direktir.',
+    metin: 'Başlığında standart ince mum için yuva var. İki boy birlikte gelir: 80 ve 115 mm.',
+    imza: { ad: 'Kömür', neden: 'Döküm demir babaların siyahı' },
+    ozellik: [
+      ['Ölçü', 'Ø58 × 80 mm ve Ø58 × 115 mm'],
+      ['Ağırlık', 'Yaklaşık 265 g ve 375 g'],
+      ['Mum', 'İnce mum, Ø22 mm'],
+    ],
+    uyari: 'Yanan mumu yalnız bırakmayın.',
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'silo',
+    ad: 'SİLO',
+    rol: 'Kalemlik',
+    fiyat: 890,
+    kaynak: 'Liman siloları yan yana kaynaşmış silindirlerdir.',
+    metin: 'Üç boy silo, üç ayrı bölme: kalem, makas, fırça.',
+    imza: { ad: 'Pas', neden: 'Limandaki çeliğin rengi' },
+    ozellik: [
+      ['Ölçü', '94 × 83 × 120 mm'],
+      ['Ağırlık', 'Yaklaşık 695 g'],
+      ['Bölmeler', 'Ø36, Ø32 ve Ø28 mm'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'rihtim',
+    ad: 'RIHTIM',
+    rol: 'Tütsülük',
+    fiyat: 490,
+    kaynak: 'Rıhtım, gemilerin yanaştığı duvardır; üstünde küçük bir baba durur.',
+    metin: 'Çubuk tütsü babadaki yuvada eğik durur, külü kanala düşer. Palo santo kanala yatar.',
+    imza: { ad: 'Yosun', neden: 'Rıhtım duvarındaki yosun' },
+    ozellik: [
+      ['Ölçü', '200 × 42 × 28 mm'],
+      ['Ağırlık', 'Yaklaşık 280 g'],
+      ['Yuva', 'Çubuk tütsü, 25° eğik'],
+      ['Altında', 'Keçe'],
+    ],
+    uyari: 'Yanan tütsüyü yalnız bırakmayın.',
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'antifer',
+    ad: 'ANTİFER',
+    rol: 'Kâğıt ağırlığı',
+    fiyat: 450,
+    kaynak: 'Antifer, dört yüzü oluklu dalgakıran küpüdür; adını Fransa’daki Antifer limanından alır.',
+    metin: 'Kâğıtları tutar, oluklarına kablo yatar.',
+    imza: { ad: 'Yosun', neden: 'Sudaki blokları saran yosun' },
+    ozellik: [
+      ['Ölçü', '58 × 58 × 58 mm'],
+      ['Ağırlık', 'Yaklaşık 375 g'],
+      ['Oluk', '14 mm'],
+    ],
+    gorsel: ['aci', 'ust'],
+  },
+  {
+    slug: 'fener',
+    ad: 'FENER',
+    rol: 'Masa lambası',
+    fiyat: 2900,
+    yakinda: true,
+    kaynak: 'Liman girişindeki mendirek feneri.',
+    metin: 'Beton gövde, ışığı yumuşatan opal başlık. Elektrik aksamının uygunluk testleri bitince satışa çıkacak.',
+    imza: { ad: 'Kömür', neden: 'Gecenin içindeki fener' },
+    ozellik: [
+      ['Ölçü', 'Gövde 115 × 115 × 192 mm, toplam yaklaşık 295 mm'],
+      ['Ağırlık', 'Yaklaşık 1,6 kg'],
+      ['Duy', 'E14'],
+    ],
+    gorsel: ['aci'],
+  },
+];
+
+export const ortak = [
+  ['Malzeme', 'Beyaz çimento esaslı beton; derzler çimento harcıyla elde doldurulur'],
+  ['Bakım', 'Kuru ya da hafif nemli bezle silin'],
+  ['Not', 'Her parça elde dökülür; ton, gözenek ve sıçrama yerleri parçadan parçaya değişir'],
+];
+
+export const urunBul = (slug) => urunler.find((u) => u.slug === slug);

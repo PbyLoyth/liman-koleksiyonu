@@ -1,0 +1,10 @@
+---
+import UrunSayfasi from '../../../components/UrunSayfasi.astro';
+import { urunler } from '../../../data/urunler.js';
+
+export function getStaticPaths() {
+  return urunler.map((u) => ({ params: { slug: u.slug }, props: { u } }));
+}
+const { u } = Astro.props;
+---
+<UrunSayfasi u={u} secili="tuz" />

@@ -1,0 +1,40 @@
+---
+import '@fontsource-variable/mona-sans/wght.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site.js';
+import { yol } from '../data/yol.js';
+
+interface Props { baslik?: string; aciklama?: string; gorsel?: string; }
+const { baslik = site.baslik, aciklama = site.aciklama, gorsel } = Astro.props;
+const kanonik = new URL(Astro.url.pathname, Astro.site).href;
+const og = new URL(gorsel ?? yol('og.jpg'), Astro.site).href;
+---
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{baslik}</title>
+    <meta name="description" content={aciklama} />
+    <link rel="canonical" href={kanonik} />
+    <meta name="theme-color" content="#f4f3f0" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href={yol('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:site_name" content={site.baslik} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:title" content={baslik} />
+    <meta property="og:description" content={aciklama} />
+    <meta property="og:url" content={kanonik} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <a class="atla" href="#icerik">İçeriğe geç</a>
+    <Header />
+    <main id="icerik"><slot /></main>
+    <Footer />
+  </body>
+</html>

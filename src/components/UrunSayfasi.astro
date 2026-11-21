@@ -1,0 +1,249 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Ornek from './Ornek.astro';
+import UrunKart from './UrunKart.astro';
+import SiparisPenceresi from './SiparisPenceresi.astro';
+import { site } from '../data/site.js';
+import { urunler, ortak } from '../data/urunler.js';
+import { yuzeyler, yuzeyBul, yuzeyAdi, yuzeyKisa, palet } from '../data/yuzeyler.js';
+import { cekimler, cekimAdi, urunGorseli } from '../data/gorseller.js';
+import { yol, urunYolu, tl } from '../data/yol.js';
+
+interface Props { u: any; secili: string; }
+const { u, secili } = Astro.props;
+const Y = yuzeyBul(secili);
+
+const baslik = secili === 'tuz' ? `${u.ad} · ${u.rol} — Liman` : `${u.ad} · ${yuzeyAdi(Y, u)} — Liman`;
+const aciklama = `${u.rol}. ${u.kaynak}`;
+const og = await getImage({ src: urunGorseli(u.slug, secili, 'aci'), width: 1200, format: 'jpg' });
+
+const veri = { ad: u.ad, rol: u.rol, fiyat: tl(u.fiyat), yakinda: !!u.yakinda, kanallar: site.siparis, yuzeyler: {} };
+for (const y of yuzeyler) {
+  const k = await getImage({ src: urunGorseli(u.slug, y.id, 'aci'), width: 160, format: 'webp' });
+  veri.yuzeyler[y.id] = {
+    ad: yuzeyAdi(y, u),
+    kisa: yuzeyKisa(y, u),
+    yol: urunYolu(u.slug, y.id),
+    tam: new URL(urunYolu(u.slug, y.id), Astro.site).href,
+    kucuk: k.src,
+  };
+}
+
+const sira = urunler.filter((d) => !d.yakinda);
+const i = Math.max(0, sira.findIndex((d) => d.slug === u.slug));
+const digerleri = [1, 2, 3].map((n) => sira[(i + n) % sira.length]).filter((d) => d.slug !== u.slug).slice(0, 3);
+---
+<Base baslik={baslik} aciklama={aciklama} gorsel={og.src}>
+  <div class="urun" data-urun data-secili={secili}>
+    <div class="kap">
+      <nav class="kirinti" aria-label="Konum">
+        <a href={`${yol('')}#urunler`}>Ürünler</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{u.ad}</span>
+      </nav>
+    </div>
+
+    <div class="kap urun-duzen">
+      <div class="galeri">
+        {yuzeyler.map((y) => {
+          const liste = cekimler(u, y.id);
+          return (
+            <div class="galeri-set" data-set={y.id} hidden={y.id !== secili}>
+              <div class="galeri-serit" tabindex="0" aria-label={`${u.ad}, ${yuzeyAdi(y, u)} görselleri`}>
+                {liste.map((c, n) => (
+                  <figure class="galeri-kare">
+                    <Image
+                      src={c.img}
+                      quality={74} widths={[640, 960, 1280, 1600]}
+                      sizes="(min-width: 960px) 56vw, 100vw"
+                      alt={`${u.ad}, ${yuzeyAdi(y, u)} yüzey, ${cekimAdi[c.cekim]}`}
+                      loading={y.id === secili && n === 0 ? 'eager' : 'lazy'}
+                      fetchpriority={y.id === secili && n === 0 ? 'high' : 'auto'}
+                    />
+                  </figure>
+                ))}
+              </div>
+              {liste.length > 1 && (
+                <div class="galeri-nokta" aria-hidden="true">
+                  {liste.map((_, n) => <span class:list={[n === 0 && 'etkin']} />)}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div class="bilgi">
+        <div class="bilgi-yapiskan">
+          {u.yakinda && <span class="rozet">Yakında</span>}
+          <h1>{u.ad}</h1>
+          <p class="bilgi-rol">{u.rol}</p>
+          <p class="bilgi-fiyat">{tl(u.fiyat)}</p>
+
+          <div class="secim">
+            <p class="secim-bas">Yüzey: <strong data-yuzey-ad>{yuzeyAdi(Y, u)}</strong></p>
+            <ul class="secim-liste">
+              {yuzeyler.map((y) => (
+                <li>
+                  <a
+                    class="sw"
+                    href={urunYolu(u.slug, y.id)}
+                    data-yuzey={y.id}
+                    aria-label={yuzeyAdi(y, u)}
+                    title={yuzeyAdi(y, u)}
+                    aria-current={y.id === secili ? 'true' : undefined}
+                  >
+                    <Ornek yuzey={y.id} renk={y.id === 'renk' ? palet[u.imza.ad] : undefined} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p class="secim-not" data-yuzey-kisa>{yuzeyKisa(Y, u)}</p>
+          </div>
+
+          <button class="dugme dugme-genis" type="button" data-siparis-ac data-ana-dugme>
+            {u.yakinda ? 'Çıkınca haber ver' : 'Sipariş ver'}
+          </button>
+
+          <div class="bilgi-metin">
+            <p>{u.kaynak}</p>
+            <p>{u.metin}</p>
+          </div>
+          <ul class="guven">
+            <li>Siparişle, elde dökülür</li>
+            <li>14 gün içinde iade, kargo bizden</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <section class="kap ozellikler" aria-labelledby="oz-bas">
+      <h2 id="oz-bas">Ölçü ve bakım</h2>
+      <dl class="oz-liste">
+        {[...u.ozellik, ...ortak].map(([k, v]) => (
+          <div><dt>{k}</dt><dd>{v}</dd></div>
+        ))}
+        {u.uyari && <div><dt>Güvenlik</dt><dd>{u.uyari}</dd></div>}
+      </dl>
+    </section>
+
+    <section class="kap diger" aria-labelledby="diger-bas">
+      <h2 id="diger-bas">Diğer parçalar</h2>
+      <div class="izgara">
+        {digerleri.map((d) => <UrunKart u={d} />)}
+      </div>
+    </section>
+
+    <div class="alt-cubuk" data-alt-cubuk>
+      <div class="alt-cubuk-ad">
+        <strong>{u.ad}</strong>
+        <span data-cubuk-yuzey>{yuzeyAdi(Y, u)}</span>
+      </div>
+      <button class="dugme" type="button" data-siparis-ac>
+        {u.yakinda ? 'Haber ver' : `Sipariş ver · ${tl(u.fiyat)}`}
+      </button>
+    </div>
+
+    <SiparisPenceresi ad={u.ad} fiyat={tl(u.fiyat)} yakinda={u.yakinda} />
+  </div>
+  <script type="application/json" id="urun-veri" set:html={JSON.stringify(veri)} />
+</Base>
+
+<script>
+  const kok = document.querySelector<HTMLElement>('[data-urun]')!;
+  const veri = JSON.parse(document.getElementById('urun-veri')!.textContent!);
+  let secili = kok.dataset.secili!;
+  const setler = [...kok.querySelectorAll<HTMLElement>('[data-set]')];
+  const ornekler = [...kok.querySelectorAll<HTMLAnchorElement>('.secim-liste .sw')];
+  const adEl = kok.querySelector('[data-yuzey-ad]')!;
+  const kisaEl = kok.querySelector('[data-yuzey-kisa]')!;
+  const cubukYuzey = kok.querySelector('[data-cubuk-yuzey]')!;
+
+  // Yüzey seçimi: sayfa yenilenmeden görseller değişir, adres yüzeyin kendi sayfasına geçer (paylaşılabilir)
+  function yuzeySec(id: string) {
+    const y = veri.yuzeyler[id];
+    if (!y || id === secili) return;
+    secili = id;
+    kok.dataset.secili = id;
+    setler.forEach((s) => (s.hidden = s.dataset.set !== id));
+    ornekler.forEach((a) => (a.dataset.yuzey === id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    adEl.textContent = y.ad;
+    kisaEl.textContent = y.kisa;
+    cubukYuzey.textContent = y.ad;
+    document.title = id === 'tuz' ? `${veri.ad} · ${veri.rol} — Liman` : `${veri.ad} · ${y.ad} — Liman`;
+    history.replaceState(null, '', y.yol);
+    const serit = kok.querySelector<HTMLElement>(`[data-set="${id}"] .galeri-serit`);
+    if (serit) serit.scrollLeft = 0;
+  }
+  ornekler.forEach((a) =>
+    a.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      yuzeySec(a.dataset.yuzey!);
+    }),
+  );
+
+  // Telefonda kaydırmalı galeri: nokta göstergesi
+  kok.querySelectorAll<HTMLElement>('.galeri-set').forEach((set) => {
+    const serit = set.querySelector<HTMLElement>('.galeri-serit');
+    const noktalar = [...set.querySelectorAll('.galeri-nokta span')];
+    if (!serit || !noktalar.length) return;
+    serit.addEventListener(
+      'scroll',
+      () => {
+        const n = Math.round(serit.scrollLeft / Math.max(1, serit.clientWidth));
+        noktalar.forEach((s, j) => s.classList.toggle('etkin', j === n));
+      },
+      { passive: true },
+    );
+  });
+
+  // Telefonda alt çubuk: ana sipariş düğmesi görünmüyorken çıkar
+  const cubuk = kok.querySelector<HTMLElement>('[data-alt-cubuk]')!;
+  const ana = kok.querySelector<HTMLElement>('[data-ana-dugme]')!;
+  new IntersectionObserver(([g]) => cubuk.classList.toggle('acik', !g.isIntersecting)).observe(ana);
+
+  // Sipariş penceresi
+  const dlg = kok.querySelector<HTMLDialogElement>('[data-siparis]')!;
+  const durum = dlg.querySelector<HTMLElement>('[data-sp-durum]')!;
+  const metin = dlg.querySelector<HTMLTextAreaElement>('[data-sp-mesaj]')!;
+  const mesaj = () => {
+    const y = veri.yuzeyler[secili];
+    return veri.yakinda
+      ? `Merhaba, ${veri.ad} (${y.ad}) satışa çıkınca haber verir misiniz?\n${y.tam}`
+      : `Merhaba, sipariş vermek istiyorum:\n${veri.ad} · ${y.ad} · ${veri.fiyat}\n${y.tam}`;
+  };
+  function ac() {
+    const y = veri.yuzeyler[secili];
+    const m = mesaj();
+    const k = veri.kanallar;
+    dlg.querySelector('[data-sp-yuzey]')!.textContent = y.ad;
+    dlg.querySelector<HTMLImageElement>('[data-sp-img]')!.src = y.kucuk;
+    metin.value = m;
+    durum.textContent = '';
+    const wa = dlg.querySelector<HTMLAnchorElement>('[data-kanal="whatsapp"]');
+    if (wa) wa.href = `https://wa.me/${k.whatsapp}?text=${encodeURIComponent(m)}`;
+    const ep = dlg.querySelector<HTMLAnchorElement>('[data-kanal="eposta"]');
+    if (ep) ep.href = `mailto:${k.eposta}?subject=${encodeURIComponent(`Sipariş: ${veri.ad} · ${y.ad}`)}&body=${encodeURIComponent(m)}`;
+    const ig = dlg.querySelector<HTMLAnchorElement>('[data-kanal="instagram"]');
+    if (ig) ig.href = `https://ig.me/m/${k.instagram}`;
+    dlg.showModal();
+  }
+  async function kopyala() {
+    const m = mesaj();
+    try {
+      await navigator.clipboard.writeText(m);
+    } catch {
+      metin.select();
+      document.execCommand('copy');
+    }
+    durum.textContent = 'Mesaj kopyalandı.';
+  }
+  kok.querySelectorAll('[data-siparis-ac]').forEach((b) => b.addEventListener('click', ac));
+  dlg.querySelector('[data-kopyala]')!.addEventListener('click', kopyala);
+  dlg.querySelector('[data-kanal="instagram"]')?.addEventListener('click', kopyala);
+  dlg.addEventListener('click', (e) => {
+    if (e.target === dlg) dlg.close();
+  });
+</script>

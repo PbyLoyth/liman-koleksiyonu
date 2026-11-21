@@ -1,0 +1,28 @@
+---
+import { yol } from '../data/yol.js';
+const ev = yol('');
+---
+<header class="ust">
+  <div class="ust-ic">
+    <a class="marka" href={ev} aria-label="Liman, ana sayfa">
+      <svg class="marka-iz" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 12V3.6M12 12l7.3 4.2M12 12l-7.3 4.2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+        <circle cx="12" cy="12" r="2.7" fill="currentColor" />
+      </svg>
+      <span class="marka-ad">LİMAN</span>
+    </a>
+    <nav class="ust-menu" aria-label="Ana menü">
+      <a href={`${ev}#urunler`}>Ürünler</a>
+      <a href={`${ev}#yuzeyler`}>Yüzeyler</a>
+      <a href={`${ev}#hikaye`} class="genis-ekran">Hikâye</a>
+      <a href={yol('siparis/')}>Sipariş</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const ust = document.querySelector('.ust');
+  const bak = () => ust?.classList.toggle('kaydi', window.scrollY > 4);
+  addEventListener('scroll', bak, { passive: true });
+  bak();
+</script>

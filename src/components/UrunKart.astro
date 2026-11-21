@@ -1,0 +1,76 @@
+---
+import { getImage } from 'astro:assets';
+import Ornek from './Ornek.astro';
+import { yuzeyler, yuzeyAdi, palet } from '../data/yuzeyler.js';
+import { urunGorseli } from '../data/gorseller.js';
+import { urunYolu, tl } from '../data/yol.js';
+
+interface Props { u: any; }
+const { u } = Astro.props;
+const BOY = '(min-width: 1100px) 340px, (min-width: 700px) 30vw, 46vw';
+const kucuk = {};
+for (const y of yuzeyler) {
+  const img = urunGorseli(u.slug, y.id, 'aci');
+  const g = await getImage({ src: img, widths: [360, 540, 720], format: 'webp', quality: 74 });
+  kucuk[y.id] = { src: g.src, srcset: g.srcSet.attribute };
+}
+const ilk = kucuk.tuz;
+---
+<article class="kart" data-kart>
+  <a class="kart-gorsel" href={urunYolu(u.slug)} tabindex="-1" aria-hidden="true">
+    <img
+      src={ilk.src}
+      srcset={ilk.srcset}
+      sizes={BOY}
+      width="1600"
+      height="2000"
+      alt=""
+      loading="lazy"
+      decoding="async"
+      data-kart-img
+    />
+  </a>
+  <div class="kart-bilgi">
+    <h3 class="kart-ad"><a href={urunYolu(u.slug)}>{u.ad}</a></h3>
+    <p class="kart-rol">{u.rol}</p>
+    <p class="kart-fiyat">{tl(u.fiyat)}</p>
+  </div>
+  <ul class="kart-ornekler" aria-label={`${u.ad} yüzeyleri`}>
+    {yuzeyler.map((y) => (
+      <li>
+        <a
+          class="sw sw-kucuk"
+          href={urunYolu(u.slug, y.id)}
+          aria-label={`${u.ad}, ${yuzeyAdi(y, u)}`}
+          title={yuzeyAdi(y, u)}
+          data-src={kucuk[y.id].src}
+          data-srcset={kucuk[y.id].srcset}
+        >
+          <Ornek yuzey={y.id} renk={y.id === 'renk' ? palet[u.imza.ad] : undefined} />
+        </a>
+      </li>
+    ))}
+  </ul>
+</article>
+
+<script>
+  // Fareyle yüzey örneğinin üstüne gelince kart görseli o yüzeye geçer; dokunmatikte örnek doğrudan sayfayı açar
+  const fare = matchMedia('(hover: hover) and (pointer: fine)');
+  document.querySelectorAll<HTMLElement>('[data-kart]').forEach((kart) => {
+    const img = kart.querySelector<HTMLImageElement>('[data-kart-img]');
+    if (!img) return;
+    const ilk = { src: img.getAttribute('src') ?? '', srcset: img.getAttribute('srcset') ?? '' };
+    const goster = (a: HTMLElement) => {
+      img.srcset = a.dataset.srcset ?? '';
+      img.src = a.dataset.src ?? '';
+    };
+    kart.querySelectorAll<HTMLElement>('.sw-kucuk').forEach((a) => {
+      a.addEventListener('pointerenter', () => fare.matches && goster(a));
+      a.addEventListener('focus', () => goster(a));
+    });
+    kart.querySelector('.kart-ornekler')?.addEventListener('pointerleave', () => {
+      img.srcset = ilk.srcset;
+      img.src = ilk.src;
+    });
+  });
+</script>

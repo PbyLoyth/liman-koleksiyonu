@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site.js';
+import { yol } from '../data/yol.js';
+
+const s = site.satici;
+const satici = [
+  ['Satıcı', s.unvan],
+  ['Adres', s.adres],
+  ['Vergi dairesi ve no', s.vergi],
+  ['MERSİS no', s.mersis],
+  ['E-posta', s.eposta],
+  ['Telefon', s.telefon],
+].filter(([, v]) => v);
+---
+<Base baslik="Sipariş ve iade — Liman" aciklama="Sipariş nasıl verilir, teslim, iade ve gizlilik.">
+  <article class="kap metin-sayfa">
+    <h1>Sipariş ve iade</h1>
+    <p class="metin-giris">Kısa ve açık: nasıl sipariş verilir, ne zaman gelir, nasıl iade edilir.</p>
+
+    <section>
+      <h2>Sipariş</h2>
+      <p>Ürün sayfasında parçayı ve yüzeyini seç, <b>Sipariş ver</b>’e bas. Pencere sipariş mesajını hazırlar; mesajı gönderdiğinde siparişin bize ulaşır.</p>
+      <p>Her parça siparişle elde dökülür ve beton kürünü tamamlamak için birkaç gün bekler. Teslim süresini ve kargo ücretini mesajda netleştiririz.</p>
+      {site.odeme ? <p>Ödeme: {site.odeme}.</p> : <p>Ödeme seçeneklerini sipariş mesajında paylaşırız.</p>}
+    </section>
+
+    <section>
+      <h2>İade</h2>
+      <p>Teslimden sonraki 14 gün içinde gerekçe göstermeden cayma hakkını kullanabilirsin. Bize mesajla bildirmen yeterli.</p>
+      <p>İade kargo ücreti bize aittir. Ürünü kullanılmamış ve paketiyle geri gönder; bedel, bildiriminin bize ulaştığı günden itibaren 14 gün içinde iade edilir.</p>
+    </section>
+
+    <section>
+      <h2>Kargoda hasar</h2>
+      <p>Paket hasarlı gelirse teslim aldığın gün fotoğrafını gönder. Yenisini döküp göndeririz ya da bedelini iade ederiz.</p>
+    </section>
+
+    <section>
+      <h2>Beton hakkında</h2>
+      <p>Her parça elde döküldüğü için ton, küçük gözenekler ve sıçrama yerleri parçadan parçaya değişir. İki parça birebir aynı olmaz.</p>
+      <p>Kuru ya da hafif nemli bezle silmen yeterli. KESON ve RIHTIM’ın altında keçe var; diğer parçaları hassas yüzeylerde altına keçe koyarak kullan.</p>
+    </section>
+
+    <section>
+      <h2>Gizlilik</h2>
+      <p>Bu site çerez kullanmaz ve kişisel veri toplamaz. Sipariş mesajında paylaştığın bilgileri yalnız siparişini hazırlamak ve göndermek için kullanırız.</p>
+    </section>
+
+    {satici.length > 0 && (
+      <section>
+        <h2>Satıcı bilgileri</h2>
+        <dl class="oz-liste">
+          {satici.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
+      </section>
+    )}
+
+    <p class="geri"><a href={`${yol('')}#urunler`}>Ürünlere dön <span aria-hidden="true">›</span></a></p>
+  </article>
+</Base>

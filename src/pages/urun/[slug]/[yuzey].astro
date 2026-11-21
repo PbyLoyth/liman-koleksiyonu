@@ -1,0 +1,14 @@
+---
+import UrunSayfasi from '../../../components/UrunSayfasi.astro';
+import { urunler } from '../../../data/urunler.js';
+import { yuzeyler } from '../../../data/yuzeyler.js';
+
+// Her yüzeyin kendi adresi var: paylaşılan bağlantı o yüzeyin görseliyle açılır
+export function getStaticPaths() {
+  return urunler.flatMap((u) =>
+    yuzeyler.filter((y) => y.id !== 'tuz').map((y) => ({ params: { slug: u.slug, yuzey: y.id }, props: { u, yuzey: y.id } })),
+  );
+}
+const { u, yuzey } = Astro.props;
+---
+<UrunSayfasi u={u} secili={yuzey} />
