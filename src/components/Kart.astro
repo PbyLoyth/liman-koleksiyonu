@@ -1,0 +1,27 @@
+---
+// Ürün kartı: ana fotoğraf; üstüne gelince detay fotoğrafı (Chrome Hearts'taki gibi ikinci görsel)
+import { dikey, yol } from '../data/gorsel.js';
+interface Props { u: any; sizes?: string; }
+const { u, sizes = '(min-width: 1100px) 24vw, (min-width: 720px) 32vw, 50vw' } = Astro.props;
+const ana = dikey(`${u.slug}-ana`);
+const detay = dikey(`${u.slug}-detay`);
+---
+<li class="kart" data-k={u.koleksiyon}>
+  <a href={yol(`urun/${u.slug}/`)}>
+    <div class="kart-gorsel" style={`view-transition-name: u-${u.slug}`}>
+      <img class="ana" src={ana.src} srcset={ana.srcset} sizes={sizes} width="1024" height="1280" alt={`${u.ad}: ${u.rol.toLocaleLowerCase('tr-TR')}, ${u.malzeme.toLocaleLowerCase('tr-TR')}`} loading="lazy" decoding="async" />
+      <img class="detay" src={detay.src} srcset={detay.srcset} sizes={sizes} width="1024" height="1280" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    </div>
+    <p class="harf kart-ad">{u.ad}</p>
+    <p class="kart-alt soluk">{u.malzeme}</p>
+  </a>
+</li>
+
+<style>
+  .kart a { display: grid; gap: 6px; text-align: center; }
+  .kart-gorsel { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--siyah); margin-bottom: 12px; }
+  .kart-gorsel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .detay { opacity: 0; transition: opacity .6s var(--yavas); }
+  @media (hover: hover) { .kart a:hover .detay { opacity: 1; } }
+  .kart-alt { font-size: 12px; }
+</style>

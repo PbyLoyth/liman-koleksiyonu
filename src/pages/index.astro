@@ -1,627 +1,122 @@
 ---
-import { Image } from 'astro:assets';
-import { existsSync } from 'node:fs';
-import Base from '../layouts/Base.astro';
-import UrunKart from '../components/UrunKart.astro';
-import Ornek from '../components/Ornek.astro';
-import Kayan from '../components/Kayan.astro';
-import Isaret from '../components/Isaret.astro';
-import { urunler, koleksiyonlar } from '../data/urunler.js';
-import { yuzeyler, yuzeyBul, malzemeler, tamAd } from '../data/yuzeyler.js';
-import {
-  donusKok, kapakKok, ilkKare, masadaGorsel, sahneler, cekildi, foto, fotoVar, kapakFoto, cekimAdi, KARE, KAPAK_KARE,
-} from '../data/gorseller.js';
-import { konseptler, atolye, konseptGorsel, konseptVar, kampanya, kampanyaVar } from '../data/konsept.js';
-import { yol, urunYolu } from '../data/yol.js';
+import Taban from '../layouts/Taban.astro';
+import Kart from '../components/Kart.astro';
+import { marka, koleksiyonlar, urunler } from '../data/koleksiyon.js';
+import { genis, yol, var_, dosyaVar } from '../data/gorsel.js';
 
-const gorunen = urunler.filter((u) => !u.gizli);
-
-// Kapak dönüşü 48 kare (kapak/<ürün>); yoksa ürünün 24 karelik Tuz dönüşü
-const KAPAK = existsSync('public/donus/kapak/kemer-kara/b/00.webp') ? 'kemer-kara' : 'kemer'; // kara çelik Kemer
-const kapakVar = existsSync(`public/donus/kapak/${KAPAK}/b/00.webp`);
-const kapakYolu = kapakVar ? kapakKok(KAPAK) : donusKok('kemer', 'tuz');
-const kapak = ilkKare(kapakYolu);
-const DIZI = 'sapel';
-// Masada: yalnız beton ya da çelik sahneler (renkli yüzeyli eski sahneler gösterilmez)
-const masada = Object.keys(sahneler)
-  .map((slug) => ({ u: gorunen.find((x) => x.slug === slug), ...sahneler[slug], img: masadaGorsel(slug) }))
-  .filter((m) => m.u && m.img && yuzeyBul(m.yuzey));
-// Anahtar: bütün parçaları çekilmiş yüzeyler, malzemeye göre gruplu; ızgara açılışta Brüt (yoksa Tuz)
-const anahtar = yuzeyler.filter((y) => gorunen.every((u) => cekildi(u.slug, y.id)));
-const varsayilan = anahtar.some((y) => y.id === 'brut') ? 'brut' : 'tuz';
-const dizi = yuzeyler.filter((y) => cekildi(DIZI, y.id));
-const kapaklar = { katedral: kapakFoto('katedral'), liman: kapakFoto('liman') };
-
-// Her açıdan: yalnız beton ve çelik fotoğrafları
-const DUVAR = [
-  ['kemer', 'lansman', 'aci'], ['payanda', 'grafit', 'aci'], ['gul', 'lansman', 'ust'], ['sapel', 'tuz', 'aci'],
-  ['keson', 'grafit', 'ust'], ['dalgakiran', 'lansman', 'aci'], ['demet', 'grafit', 'aci'], ['baba', 'lansman', 'aci'],
-  ['silo', 'tuz', 'ust'], ['rihtim', 'lansman', 'aci'], ['antifer', 'grafit', 'aci'], ['sapel', 'lansman', 'ust'],
-  ['payanda', 'lansman', 'ust'], ['kemer', 'grafit', 'ust'], ['gul', 'tuz', 'aci'], ['keson', 'lansman', 'aci'],
-];
-const duvar = DUVAR.filter(([s, y, c]) => fotoVar(s, y, c))
-  .map(([s, y, c]) => ({ u: gorunen.find((x) => x.slug === s), y: yuzeyBul(y), c, f: foto(s, y, c) }))
-  .filter((d) => d.u && d.y);
-
-const kamp = ['katedral-genis', 'kemer-ayna', 'sapel-gece', 'payanda-masada', 'sapel-ayna', 'gul-ayna'].filter(kampanyaVar);
-const kons = konseptler.filter((k) => konseptVar(k.gorsel));
-const atolyeVar = Object.values(atolye).some(konseptVar);
+// Giriş: tam ekran, yavaş bir film döngüsü (Chrome Hearts düzeni). Önce afiş görseli görünür, video hazır olunca
+// üstüne açılır. Dikey ekranda ayrı dikey çekim. Hareket azaltma ya da veri tasarrufu açıksa yalnız afiş kalır.
+const yeniGiris = var_('giris-yatay', 1920);
+const yatay = yeniGiris
+  ? { src: yol('g/giris-yatay-1920.webp'), srcset: `${yol('g/giris-yatay-1280.webp')} 1280w, ${yol('g/giris-yatay-1920.webp')} 1920w, ${yol('g/giris-yatay-2560.webp')} 2560w` }
+  : genis('kampanya-katedral');
+const dikey = var_('giris-dikey', 1080) ? `${yol('g/giris-dikey-720.webp')} 720w, ${yol('g/giris-dikey-1080.webp')} 1080w` : null;
+const video = dosyaVar('g/giris-yatay.mp4');
 ---
-<Base ana>
-  <section class="kapak koyu" data-ton="koyu" aria-labelledby="kapak-bas">
-    <h1 id="kapak-bas" class="kapak-baslik marka">
-      <span class="satir"><span class="krom canli">Savana</span></span>
-      <span class="satir"><span class="krom canli">Season</span></span>
-    </h1>
-    <div class="kapak-isik" aria-hidden="true"></div>
-    <div
-      class="donus kapak-urun"
-      data-donus
-      data-mod="oto"
-      data-boy="b"
-      data-kok={kapakYolu}
-      data-kare={kapakVar ? KAPAK_KARE : KARE}
-      role="img"
-      aria-label="Kemer kitap desteği, kara çelik, kendi ekseninde dönüyor"
-    >
-      <img src={kapak.src} srcset={kapak.srcset} sizes="(min-width: 900px) 54svh, 86vw" width="1000" height="1250" alt="" loading="eager" fetchpriority="high" decoding="async" />
-    </div>
-    <p class="kose kose-su mono">Yalnız beton<br />Yalnız çelik</p>
-    <p class="kose kose-sa mono">Katedral · Liman<br />Brütalist · Gotik · Endüstri</p>
-    <a class="kose kose-alt-sol mono" href="#kampanya">Kampanya <span aria-hidden="true">↓</span></a>
-    <p class="kose kose-alt-sag mono">Sürükle, döndür<br />Elde yapılır</p>
+<Taban saydam>
+  <section class="giris" data-giris aria-label="Giriş">
+    <picture class="giris-afis">
+      {dikey && <source media="(max-aspect-ratio: 4/5)" srcset={dikey} sizes="100vw" />}
+      <img src={yatay.src} srcset={yatay.srcset} sizes="100vw" width="1920" height="1080" alt="Beton ve kararmış çelikten nesneler, karanlık bir şapelde mum ışığında; arkada duvara dökülmüş büyük bir gotik haç" fetchpriority="high" decoding="async" />
+    </picture>
+    {video && (
+      <video class="giris-video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"
+        data-yatay={yol('g/giris-yatay')} data-dikey={dosyaVar('g/giris-dikey.mp4') ? yol('g/giris-dikey') : ''}></video>
+    )}
+    <a class="kaydir harf" href="#koleksiyon"><span>Kaydır</span><i aria-hidden="true"></i></a>
   </section>
 
-  <Kayan />
-
-  {kamp.length > 0 && (
-    <section id="kampanya" class="kampanya koyu" data-ton="koyu" aria-labelledby="kampanya-bas">
-      <div class="kap bas belir">
-        <div>
-          <p class="bolum-no">01 — Kampanya</p>
-          <h2 id="kampanya-bas" class="baslik">Yalnız beton. Yalnız çelik. <span class="soluk">Başka bir şey yok.</span></h2>
-        </div>
-        <p class="bas-yan">Ham beton ve parlatılmış çelik; katedralin kemeri, limanın bloğu, fabrikanın kirişi.</p>
-      </div>
-      <div class="kap kamp-izgara">
-        {kamp.map((ad, i) => {
-          const g = kampanya(ad);
-          return (
-            <figure class:list={['kamp-kare foto', i === 0 && 'genis']}>
-              <img src={g.src} srcset={g.srcset} sizes={i === 0 ? '(min-width: 900px) 92vw, 100vw' : '(min-width: 900px) 30vw, 50vw'} alt="Savana Season kampanya fotoğrafı, kara-beyaz" loading="lazy" decoding="async" />
-            </figure>
-          );
-        })}
-      </div>
-    </section>
-  )}
-
-  <section id="koleksiyon" class="dukkan koyu" data-ton="koyu" data-dukkan data-taban={yol('')}>
-    <div class="kap bas belir">
-      <div>
-        <p class="bolum-no">02 — Koleksiyon</p>
-        <h2 class="baslik">Koleksiyon. <span class="soluk">Her parça betonda da çelikte de.</span></h2>
-      </div>
-      <div class="anahtar" role="group" aria-label="Bütün parçaları şu malzemede göster">
-        <p class="ust">Malzeme <span class="anahtar-ad" aria-live="polite" data-anahtar-ad>{tamAd(yuzeyBul(varsayilan))}</span></p>
-        <div class="anahtar-gruplar">
-          {malzemeler.map((m) => {
-            const ys = anahtar.filter((y) => y.malzeme === m.id);
-            return ys.length > 0 && (
-              <div class="anahtar-grup">
-                <span class="mono soluk">{m.ad}</span>
-                <div class="anahtar-liste">
-                  {ys.map((y) => (
-                    <button type="button" class="anahtar-dugme" data-yz={y.id} data-ad={tamAd(y)} aria-pressed={y.id === varsayilan ? 'true' : 'false'} aria-label={`${tamAd(y)}: ${y.kisa}`} title={tamAd(y)}>
-                      <Ornek yuzey={y.id} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-
-    {koleksiyonlar.map((k, n) => {
-      const liste = gorunen.filter((u) => u.koleksiyon === k.id);
-      const kf = kapaklar[k.id];
-      return (
-        <div class="kol" id={k.id}>
-          <figure class="kol-kapak foto">
-            <img src={kf.src} srcset={kf.srcset} sizes="100vw" width="2400" height="1200" alt={`${k.ad} koleksiyonu, serim`} loading="lazy" decoding="async" />
-            <figcaption class="kap kol-yazi">
-              <span class="mono">0{n + 1} · {liste.length} parça</span>
-              <h3 class="baslik">{k.ad}</h3>
-              <p>{k.alt}</p>
-            </figcaption>
-          </figure>
-          <ul class="izgara">
-            {liste.map((u) => <UrunKart u={u} yuzey={varsayilan} />)}
-          </ul>
-        </div>
-      );
-    })}
-  </section>
-
-  {kons.length > 0 && (
-    <section id="konsept" class="konsept koyu" data-ton="koyu" aria-labelledby="konsept-bas">
-      <div class="kap bas belir">
-        <div>
-          <p class="bolum-no">03 — Konseptler</p>
-          <h2 id="konsept-bas" class="baslik">Neler yapabiliriz. <span class="soluk">Fabrikadan ve katedralden fikirler.</span></h2>
-        </div>
-        <p class="bas-yan">Kiriş, somun, perçin, flanş, donatı. Endüstrinin parçaları gotik ayrıntıyla, yine tek malzemeden.</p>
-      </div>
-      <ul class="kap konsept-izgara">
-        {kons.map((k, i) => {
-          const g = konseptGorsel(k.gorsel);
-          return (
-            <li class="konsept-kart">
-              <figure class="konsept-gorsel foto">
-                <img src={g.src} srcset={g.srcset} sizes="(min-width: 1100px) 24vw, (min-width: 700px) 33vw, 50vw" width="1024" height="1280" alt={`${k.ad}: ${k.rol.toLocaleLowerCase('tr-TR')}, ${k.malzeme.toLocaleLowerCase('tr-TR')} konsept görseli`} loading="lazy" decoding="async" />
-                <span class="mono konsept-etiket">Konsept {String(i + 1).padStart(2, '0')}</span>
-              </figure>
-              <div class="konsept-yazi">
-                <h3 class="konsept-ad">{k.ad}</h3>
-                <p class="mono soluk">{k.rol} · {k.malzeme}</p>
-                <p class="soluk">{k.metin}</p>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-      <p class="kap mono soluk not">Konsept görseller yapay zekâyla, kendi makinemizde üretildi; ürün henüz dökülmedi.</p>
-    </section>
-  )}
-
-  <section id="galeri" class="galeri koyu" data-ton="koyu" aria-labelledby="galeri-bas">
-    <div class="kap bas belir">
-      <div>
-        <p class="bolum-no">04 — Fotoğraflar</p>
-        <h2 id="galeri-bas" class="baslik">Her açıdan. <span class="soluk">Yandan, üstten; betonda ve çelikte.</span></h2>
-      </div>
-      <p class="bas-yan">Beton parçalar traverten ve mermer üstünde, çelik parçalar ışığı yansıtırken.</p>
-    </div>
-    <ul class="kap duvar">
-      {duvar.map((d) => (
-        <li>
-          <a class="duvar-kare foto" href={urunYolu(d.u.slug, cekildi(d.u.slug, d.y.id) ? d.y.id : 'tuz')}>
-            <img src={d.f.src} srcset={d.f.srcset} sizes="(min-width: 1100px) 24vw, (min-width: 700px) 32vw, 50vw" width="1200" height="1500" alt={`${d.u.ad}, ${tamAd(d.y)}, ${cekimAdi[d.c].toLocaleLowerCase('tr-TR')}`} loading="lazy" decoding="async" />
-            <span class="duvar-yazi">
-              <strong>{d.u.ad}</strong>
-              <span class="mono">{tamAd(d.y)} · {cekimAdi[d.c]}</span>
-            </span>
-          </a>
-        </li>
-      ))}
+  <section class="kap" id="koleksiyon" aria-label="Koleksiyon">
+    <h2 class="giris-satir ekran">{marka.tutku}</h2>
+    <p class="harf soluk ortali">{marka.koleksiyon} — {marka.slogan}</p>
+    <nav class="suzgec" aria-label="Koleksiyon süzgeci">
+      <button type="button" class="harf" data-suz="hepsi" aria-pressed="true">Hepsi</button>
+      {koleksiyonlar.map((k) => <button type="button" class="harf" data-suz={k.id} aria-pressed="false">{k.ad}</button>)}
+    </nav>
+    <p class="satir soluk" data-satir aria-live="polite">{urunler.length} nesne · üç kaynak · iki malzeme</p>
+    <ul class="izgara" data-izgara>
+      {urunler.map((u) => <Kart u={u} />)}
     </ul>
   </section>
-
-  {masada.length > 0 && (
-    <section id="masada" class="masada koyu" data-ton="koyu" aria-labelledby="masada-bas">
-      <div class="kap bas belir">
-        <div>
-          <p class="bolum-no">05 — Kullanım</p>
-          <h2 id="masada-bas" class="baslik">Masada. <span class="soluk">Her parçanın bir işi var.</span></h2>
-        </div>
-        <div class="masada-yan">
-          <p class="bas-yan">Şarabı tutar, mumu saklar, kitabı yaslar.</p>
-          <div class="masada-ok">
-            <button type="button" class="ok" data-yon="-1" aria-label="Önceki sahne">←</button>
-            <button type="button" class="ok" data-yon="1" aria-label="Sonraki sahne">→</button>
-          </div>
-        </div>
-      </div>
-      <div class="masada-serit" data-serit tabindex="0" aria-label="Kullanım sahneleri">
-        {masada.map((m, i) => (
-          <a class="masada-kare" href={urunYolu(m.u.slug, cekildi(m.u.slug, m.yuzey) ? m.yuzey : 'tuz')} draggable="false">
-            <div class="masada-gorsel">
-              <Image src={m.img} widths={[420, 640, 900, 1200]} sizes="(min-width: 1200px) 30vw, (min-width: 760px) 42vw, 78vw" quality={76} alt={`${m.u.ad} ${m.u.rol.toLocaleLowerCase('tr-TR')} olarak kullanımda: ${m.sahne.toLocaleLowerCase('tr-TR')}`} loading="lazy" draggable="false" />
-            </div>
-            <div class="masada-yazi">
-              <span class="mono soluk">№ {String(i + 1).padStart(2, '0')}</span>
-              <strong>{m.u.ad}</strong>
-              <span class="soluk">{m.u.rol} · {m.sahne} · {tamAd(yuzeyBul(m.yuzey))}</span>
-            </div>
-          </a>
-        ))}
-      </div>
-      <div class="kap masada-alt">
-        <div class="ilerleme" aria-hidden="true"><span data-ilerleme></span></div>
-      </div>
-    </section>
-  )}
-
-  <section id="yuzeyler" class="yuzeyler koyu" data-ton="koyu" aria-labelledby="yz-bas">
-    <div class="kap bas belir">
-      <div>
-        <p class="bolum-no">06 — Malzeme</p>
-        <h2 id="yz-bas" class="baslik">Beton ya da çelik. <span class="soluk">Kalıp aynı, malzeme değişir.</span></h2>
-      </div>
-      <p class="bas-yan">Bir parça ya baştan sona betondur ya baştan sona çelik. Boya yok, karışım yok.</p>
-    </div>
-    <ol class="dizi" data-dizi style={`--sutun: ${dizi.length}`}>
-      {dizi.map((y, i) => {
-        const kok = donusKok(DIZI, y.id);
-        const ilk = ilkKare(kok);
-        return (
-          <li class:list={['dizi-oge', i > 0 && dizi[i - 1].malzeme !== y.malzeme && 'yeni-grup']}>
-            <div class="donus havuz" data-donus data-mod="dis" data-kok={kok} data-kare={KARE}>
-              <img src={ilk.src} srcset={ilk.srcset} sizes="(min-width: 1000px) 18vw, 44vw" width="1000" height="1250" alt={`Şapel, ${tamAd(y)}`} loading="lazy" decoding="async" />
-            </div>
-            <div class="dizi-yazi">
-              <span class="mono soluk">{y.malzeme === 'celik' ? 'Çelik' : 'Beton'}</span>
-              <h3 class="dizi-ad">{y.ad}</h3>
-              <p class="soluk">{y.kisa}</p>
-            </div>
-          </li>
-        );
-      })}
-    </ol>
-    <p class="kap mono soluk dizi-ipucu">Fareyi dizinin üstünde gezdir: hepsi birlikte döner.</p>
-  </section>
-
-  {atolyeVar && (
-    <section id="atolye" class="atolye koyu" data-ton="koyu" aria-labelledby="atolye-bas">
-      <div class="kap bas belir">
-        <div>
-          <p class="bolum-no">07 — Atölye</p>
-          <h2 id="atolye-bas" class="baslik">Dökülür, kesilir, kazınır. <span class="soluk">Elde.</span></h2>
-        </div>
-        <p class="bas-yan">Beton silikon kalıba elde dökülür, derzleri harçla dolar. Çelik kesilir, kaynaklanır, çizgileri kazınır ve karartılır.</p>
-      </div>
-      <div class="kap atolye-izgara">
-        {[['dokum', 'Döküm'], ['kesim', 'Kesim'], ['makro', 'Kazıma'], ['zincir', 'Çelik ve beton']].filter(([a]) => konseptVar(atolye[a])).map(([a, ad], i) => {
-          const g = konseptGorsel(atolye[a]);
-          return (
-            <figure class:list={['atolye-kare foto', i === 0 && 'genis']}>
-              <img src={g.src} srcset={g.srcset} sizes={i === 0 ? '(min-width: 900px) 60vw, 100vw' : '(min-width: 900px) 30vw, 100vw'} alt={`${ad}, atölye görseli`} loading="lazy" decoding="async" />
-              <figcaption class="mono">{ad}</figcaption>
-            </figure>
-          );
-        })}
-      </div>
-    </section>
-  )}
-
-  <section id="hikaye" class="hikaye koyu" data-ton="koyu" aria-labelledby="hikaye-bas">
-    <div class="kap hikaye-ic">
-      <p class="bolum-no">08 — Hikâye</p>
-      <h2 id="hikaye-bas" class="baslik hikaye-baslik">Beton, çelik ve ışık.</h2>
-      <div class="hikaye-metin">
-        <p>Limanda her yapının bir işi var: dalgakıran dalgayı kırar, baba halatı tutar. Katedralde taş ışığa yol açar: kemer yükü taşır, payanda duvarı tutar. Fabrikada kiriş taşır, somun sıkar, perçin tutar.</p>
-        <p>Savana Season bu yapıları masaya küçültüp onlara yeni bir iş veriyor. Malzemeye dokunmuyor: beton beton kalıyor, çelik çelik.</p>
-        <p>Her parça elde yapılır. Beton dökülür ve derzleri harçla dolar; çelik kesilir, kazınır ve karartılır.</p>
-      </div>
-      {konseptVar(atolye.katedral) ? (
-        <figure class="hikaye-gorsel">
-          <img src={konseptGorsel(atolye.katedral).src} srcset={konseptGorsel(atolye.katedral).srcset} sizes="(min-width: 900px) 38vw, 100vw" alt="Brütalist beton katedral içi, sivri pencereden düşen ışık" loading="lazy" decoding="async" />
-          <figcaption class="mono soluk">Beton katedral · konsept</figcaption>
-        </figure>
-      ) : masadaGorsel('sapel') && (
-        <figure class="hikaye-gorsel">
-          <Image src={masadaGorsel('sapel')} widths={[480, 720, 960, 1280]} sizes="(min-width: 900px) 38vw, 100vw" quality={76} alt="Şapel mum feneri gece yanarken" loading="lazy" />
-        </figure>
-      )}
-      <ul class="olgular mono">
-        <li><Isaret />Yalnız beton</li>
-        <li><Isaret />Yalnız çelik</li>
-        <li><Isaret />Boya yok</li>
-        <li><Isaret />Elde yapılır</li>
-      </ul>
-    </div>
-  </section>
-</Base>
+  <script type="application/json" id="satirlar" set:html={JSON.stringify(Object.fromEntries(koleksiyonlar.map((k) => [k.id, k.satir])))} />
+</Taban>
 
 <script>
-  import { donuslerKur, donusBul } from '../scripts/donus';
+  // Giriş videosu: yön (yatay/dikey) ekrana göre seçilir; hareket azaltma ya da veri tasarrufunda hiç yüklenmez
+  const v = document.querySelector<HTMLVideoElement>('.giris-video');
+  const sakin = matchMedia('(prefers-reduced-motion: reduce)').matches || (navigator as any).connection?.saveData;
+  if (v && !sakin) {
+    const dikeyEkran = matchMedia('(max-aspect-ratio: 4/5)');
+    let kok = '';
+    const yukle = () => {
+      const yeni = dikeyEkran.matches && v.dataset.dikey ? v.dataset.dikey : v.dataset.yatay!;
+      if (yeni === kok) return;
+      kok = yeni;
+      v.classList.remove('oynuyor');
+      v.innerHTML = `<source src="${kok}.webm" type="video/webm"><source src="${kok}.mp4" type="video/mp4">`;
+      v.load();
+      v.play().catch(() => {});
+    };
+    v.addEventListener('playing', () => v.classList.add('oynuyor'));
+    yukle();
+    dikeyEkran.addEventListener('change', yukle);
+  }
 
-  donuslerKur();
-
-  // Malzeme anahtarı: bütün kartları seçilen malzemeye çevirir
-  const dukkan = document.querySelector<HTMLElement>('[data-dukkan]')!;
-  const taban = dukkan.dataset.taban!;
-  const adEl = dukkan.querySelector<HTMLElement>('[data-anahtar-ad]')!;
-  const dugmeler = [...dukkan.querySelectorAll<HTMLButtonElement>('.anahtar-dugme')];
+  // Süzgeç: Hepsi / Katedral / Liman / Fabrika; menüdeki #katedral gibi bağlantılar da süzer
+  const dugmeler = [...document.querySelectorAll<HTMLButtonElement>('[data-suz]')];
+  const kartlar = [...document.querySelectorAll<HTMLElement>('[data-k]')];
+  const satir = document.querySelector<HTMLElement>('[data-satir]')!;
+  const ilkSatir = satir.textContent;
+  const satirlar = JSON.parse(document.getElementById('satirlar')!.textContent!);
+  function suz(id: string, kaydir = false) {
+    if (!dugmeler.some((d) => d.dataset.suz === id)) id = 'hepsi';
+    dugmeler.forEach((d) => d.setAttribute('aria-pressed', String(d.dataset.suz === id)));
+    kartlar.forEach((k) => (k.hidden = id !== 'hepsi' && k.dataset.k !== id));
+    satir.textContent = id === 'hepsi' ? ilkSatir : satirlar[id];
+    if (kaydir) document.querySelector('.suzgec')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
   dugmeler.forEach((d) =>
     d.addEventListener('click', () => {
-      const yz = d.dataset.yz!;
-      dugmeler.forEach((b) => b.setAttribute('aria-pressed', String(b === d)));
-      adEl.textContent = d.dataset.ad!;
-      dukkan.querySelectorAll<HTMLAnchorElement>('[data-kart]').forEach((a, i) => {
-        const slug = a.dataset.slug!;
-        a.href = `${taban}urun/${slug}/${yz === 'tuz' ? '' : `${yz}/`}`;
-        const don = donusBul(a.querySelector('[data-donus]'));
-        setTimeout(() => don?.kokDegistir(`${taban}donus/${slug}/${yz}/`), i * 35);
-      });
+      const id = d.dataset.suz!;
+      history.replaceState(null, '', id === 'hepsi' ? location.pathname : `#${id}`);
+      suz(id);
     }),
   );
-
-  // Malzeme dizisi: dönüşler birlikte; görünür olunca bir tur, fareyle gezdikçe döner
-  const dizi = document.querySelector<HTMLElement>('[data-dizi]')!;
-  const dizidekiler = [...dizi.querySelectorAll('[data-donus]')].map((e) => donusBul(e)!).filter(Boolean);
-  const hepsiYuklensin = () => dizidekiler.forEach((d) => d.yukle());
-  let turAtildi = false;
-  new IntersectionObserver(
-    ([g], gozcu) => {
-      if (!g.isIntersecting) return;
-      gozcu.disconnect();
-      hepsiYuklensin();
-      const bas = performance.now();
-      const bekle = () => {
-        const hazir = dizidekiler.every((d) => d.el.classList.contains('hazir'));
-        if (hazir && !turAtildi && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          turAtildi = true;
-          dizidekiler.forEach((d, i) => setTimeout(() => d.tween(d.i + d.kare, 2400), i * 70));
-        } else if (!hazir && performance.now() - bas < 8000) setTimeout(bekle, 200);
-      };
-      bekle();
-    },
-    { threshold: 0.3 },
-  ).observe(dizi);
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    dizi.addEventListener('pointerenter', hepsiYuklensin);
-    dizi.addEventListener('pointermove', (e) => {
-      const r = dizi.getBoundingClientRect();
-      const oran = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      dizidekiler.forEach((d) => {
-        d.tw = null;
-        d.i = (oran - 0.5) * (d.kare - 1);
-        d.ciz();
-      });
-    });
-    dizi.addEventListener('pointerleave', () =>
-      dizidekiler.forEach((d) => d.tween(Math.round(d.i / d.kare) * d.kare, 600)),
-    );
-  }
-
-  // Masada şeridi: fareyle sürükle, oklarla geç, ilerleme çizgisi
-  const serit = document.querySelector<HTMLElement>('[data-serit]');
-  const ilerleme = document.querySelector<HTMLElement>('[data-ilerleme]');
-  if (serit && ilerleme) {
-    const guncelle = () => {
-      const azami = serit.scrollWidth - serit.clientWidth;
-      const oran = azami > 0 ? serit.scrollLeft / azami : 0;
-      const gorunen = serit.clientWidth / serit.scrollWidth;
-      ilerleme.style.width = `${Math.max(8, gorunen * 100)}%`;
-      ilerleme.style.transform = `translateX(${oran * (1 / Math.max(gorunen, 0.08) - 1) * 100}%)`;
-    };
-    serit.addEventListener('scroll', guncelle, { passive: true });
-    addEventListener('resize', guncelle);
-    guncelle();
-    const adim = () => (serit.querySelector<HTMLElement>('.masada-kare')?.offsetWidth ?? 300) + 16;
-    document.querySelectorAll<HTMLButtonElement>('.masada-ok .ok').forEach((b) =>
-      b.addEventListener('click', () => serit.scrollBy({ left: Number(b.dataset.yon) * adim(), behavior: 'smooth' })),
-    );
-    let surukle: { x: number; sol: number; oynadi: boolean } | null = null;
-    serit.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'mouse' || e.button !== 0) return;
-      surukle = { x: e.clientX, sol: serit.scrollLeft, oynadi: false };
-      serit.classList.add('cekiliyor');
-    });
-    addEventListener('pointermove', (e) => {
-      if (!surukle) return;
-      const dx = e.clientX - surukle.x;
-      if (Math.abs(dx) > 5) surukle.oynadi = true;
-      serit.scrollLeft = surukle.sol - dx;
-    });
-    addEventListener('pointerup', () => {
-      if (!surukle) return;
-      const oynadi = surukle.oynadi;
-      surukle = null;
-      serit.classList.remove('cekiliyor');
-      if (oynadi) {
-        const engelle = (ev: Event) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-        };
-        serit.addEventListener('click', engelle, { capture: true, once: true });
-        setTimeout(() => serit.removeEventListener('click', engelle, { capture: true }), 60);
-      }
-    });
-  }
+  const hash = () => location.hash.slice(1);
+  if (hash()) suz(hash(), true);
+  addEventListener('hashchange', () => suz(hash(), true));
 </script>
 
 <style>
-  /* ---------------------------------------------------------------- kapak */
-  .kapak {
-    position: relative; height: 100svh; min-height: 600px; max-height: 1180px;
-    display: grid; place-items: center; overflow: hidden; isolation: isolate;
+  .giris { position: relative; height: 100svh; min-height: 520px; overflow: hidden; background: var(--siyah); }
+  .giris-afis img, .giris-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .giris-video { opacity: 0; transition: opacity 1.4s var(--yavas); }
+  .giris-video.oynuyor { opacity: 1; }
+  .giris::after {
+    content: ''; position: absolute; inset: auto 0 0; height: 34%; pointer-events: none;
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.72));
   }
-  .kapak-baslik {
-    position: absolute; inset: 0; z-index: 1;
-    display: flex; flex-direction: column; justify-content: center; gap: .06em;
-    padding-inline: var(--kenar);
-    font-size: clamp(96px, 19.2vw, 372px); line-height: .8;
-    pointer-events: none;
+  .kaydir {
+    position: absolute; left: 50%; bottom: max(26px, env(safe-area-inset-bottom)); z-index: 2; transform: translateX(-50%);
+    display: grid; justify-items: center; gap: 10px; font-size: 10px; color: var(--yazi);
   }
-  .satir { display: block; }
-  .satir > span { display: block; padding-block: .04em; }
-  .satir:first-child { align-self: flex-start; }
-  .satir:last-child { align-self: flex-end; }
-  .kapak-isik {
-    position: absolute; z-index: 0; left: 50%; top: 64%;
-    width: min(80vw, 1000px); aspect-ratio: 2.6 / 1; transform: translate(-50%, -50%);
-    background: radial-gradient(closest-side, rgb(255 255 255 / .11), rgb(255 255 255 / .03) 60%, transparent);
+  .kaydir i { position: relative; width: 1px; height: 46px; overflow: hidden; background: rgb(255 255 255 / 0.22); }
+  .kaydir i::after {
+    content: ''; position: absolute; inset: 0; background: var(--yazi);
+    transform: translateY(-100%); animation: akis 2.4s var(--yavas) infinite;
   }
-  .kapak-urun { position: relative; z-index: 2; width: min(86vw, 54svh); margin-top: calc(var(--ub-y) * .4); }
-  .kose { position: absolute; z-index: 3; color: var(--soluk); }
-  .kose-su { top: calc(var(--ub-y) + 18px); left: var(--kenar); }
-  .kose-sa { top: calc(var(--ub-y) + 18px); right: var(--kenar); text-align: right; }
-  .kose-alt-sol { bottom: 22px; left: var(--kenar); color: var(--yazi); }
-  .kose-alt-sag { bottom: 22px; right: var(--kenar); text-align: right; }
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .kapak { view-timeline-name: --kapak; }
-      .satir, .kapak-urun {
-        animation-timing-function: linear; animation-fill-mode: both;
-        animation-timeline: --kapak; animation-range: exit 0% exit 100%;
-      }
-      .satir:first-child { animation-name: ayril-sol; }
-      .satir:last-child { animation-name: ayril-sag; }
-      .kapak-urun { animation-name: geri-cekil; }
-      @keyframes ayril-sol { to { transform: translateX(-14%); opacity: .25; } }
-      @keyframes ayril-sag { to { transform: translateX(14%); opacity: .25; } }
-      @keyframes geri-cekil { to { transform: scale(.86) translateY(8%); opacity: .4; } }
-    }
-  }
-  @media (max-width: 760px) {
-    .kapak { min-height: 560px; }
-    .kapak-baslik { justify-content: space-between; padding-block: calc(var(--ub-y) + 64px) 70px; font-size: clamp(84px, 25vw, 160px); }
-    .kose-alt-sag { display: none; }
-  }
+  @keyframes akis { 0% { transform: translateY(-100%); } 60%, 100% { transform: translateY(100%); } }
 
-  /* ---------------------------------------------------------------- kampanya (kara-beyaz) */
-  .kampanya { padding-bottom: clamp(40px, 6vw, 90px); }
-  .kamp-izgara { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  .kamp-kare { aspect-ratio: 4 / 5; border-radius: 14px; }
-  .kamp-kare.genis { grid-column: 1 / -1; aspect-ratio: 2.2 / 1; }
-  .kamp-kare img { position: absolute; inset: 0; }
-  @media (hover: hover) { .kamp-kare:hover img { transform: scale(1.03); } }
-  @media (max-width: 760px) {
-    .kamp-izgara { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .kamp-kare.genis { aspect-ratio: 4 / 3; }
+  .giris-satir { text-align: center; padding-top: clamp(72px, 9vw, 128px); }
+  .giris-satir { font-size: clamp(30px, 4vw, 56px); }
+  .ortali { text-align: center; margin-top: 14px; }
+  .suzgec {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 30px;
+    padding-top: clamp(48px, 6vw, 80px); scroll-margin-top: calc(var(--ust) + 8px);
   }
-
-  /* ---------------------------------------------------------------- koleksiyon */
-  .anahtar { display: grid; justify-items: end; gap: 10px; padding-bottom: .5em; }
-  .anahtar-ad { margin-left: 8px; color: var(--soluk); }
-  .anahtar-gruplar { display: flex; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
-  .anahtar-grup { display: flex; align-items: center; gap: 8px; }
-  .anahtar-liste { display: flex; gap: 2px; }
-  .anahtar-dugme {
-    width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%;
-    border: 1px solid transparent; transition: border-color .2s, transform .2s var(--hiz);
-  }
-  .anahtar-dugme :global(.ornek) { width: 24px; height: 24px; }
-  .anahtar-dugme:hover { transform: scale(1.08); }
-  .anahtar-dugme[aria-pressed='true'] { border-color: var(--yazi); }
-  .kol { margin-bottom: clamp(32px, 5vw, 72px); }
-  .kol-kapak { position: relative; aspect-ratio: 2 / 1; max-height: 78svh; width: 100%; }
-  .kol-kapak img { position: absolute; inset: 0; }
-  .kol-kapak::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, rgb(0 0 0 / 0) 45%, rgb(0 0 0 / .78) 100%);
-  }
-  .kol-yazi { position: absolute; inset: auto 0 0; z-index: 1; display: grid; gap: 8px; padding-block: 0 clamp(22px, 3.4vw, 46px); }
-  .kol-yazi .mono { color: var(--ikinci); }
-  .kol-yazi h3 { font-size: clamp(40px, 6vw, 96px); }
-  .kol-yazi p { max-width: 46ch; color: var(--ikinci); }
-  @media (max-width: 760px) {
-    .anahtar { justify-items: start; }
-    .anahtar-gruplar { justify-content: flex-start; }
-    .kol-kapak { aspect-ratio: 1 / 1; }
-    .kol-kapak img { object-position: 60% 50%; }
-  }
-
-  /* ---------------------------------------------------------------- konseptler */
-  .konsept { padding-bottom: clamp(40px, 6vw, 90px); }
-  .konsept-izgara { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 12px; }
-  .konsept-kart { display: grid; gap: 14px; align-content: start; }
-  .konsept-gorsel { aspect-ratio: 4 / 5; border-radius: 14px; }
-  .konsept-gorsel img { position: absolute; inset: 0; }
-  @media (hover: hover) { .konsept-kart:hover .konsept-gorsel img { transform: scale(1.04); } }
-  .konsept-etiket {
-    position: absolute; top: 12px; left: 12px; z-index: 1; padding: 4px 9px; border-radius: 999px;
-    background: rgb(0 0 0 / .55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--ikinci);
-  }
-  .konsept-yazi { display: grid; gap: 4px; font-size: 14px; }
-  .konsept-ad { font-size: 20px; font-weight: 640; letter-spacing: -0.02em; }
-  .not { padding-top: 22px; }
-  @media (max-width: 1099px) { .konsept-izgara { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (max-width: 699px) { .konsept-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 8px; } }
-
-  /* ---------------------------------------------------------------- her açıdan */
-  .galeri { padding-bottom: clamp(48px, 7vw, 100px); }
-  .duvar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .duvar-kare { display: block; aspect-ratio: 4 / 5; border-radius: 14px; }
-  .duvar-kare img { position: absolute; inset: 0; }
-  .duvar-kare::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, transparent 58%, rgb(0 0 0 / .62));
-  }
-  .duvar-yazi { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1; display: grid; gap: 2px; }
-  .duvar-yazi strong { font-size: 12.5px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; }
-  .duvar-yazi .mono { color: var(--ikinci); }
-  @media (hover: hover) { .duvar-kare:hover img { transform: scale(1.04); } }
-  @media (max-width: 1099px) { .duvar { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (max-width: 699px) { .duvar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .duvar-kare { border-radius: 10px; } }
-
-  /* ---------------------------------------------------------------- masada */
-  .masada { padding-bottom: clamp(48px, 7vw, 96px); }
-  .masada-yan { display: grid; justify-items: end; gap: 18px; }
-  .masada-ok { display: flex; gap: 8px; }
-  .ok { width: 46px; height: 46px; border: 1px solid var(--cizgi-guclu); border-radius: 50%; font: 16px/1 var(--mono); transition: background-color .2s, color .2s; }
-  .ok:hover { background: var(--yazi); color: var(--siyah); }
-  .masada-serit {
-    display: grid; grid-auto-flow: column; grid-auto-columns: clamp(270px, 29vw, 520px); gap: 16px;
-    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--kenar); padding-inline: var(--kenar); scrollbar-width: none; cursor: grab;
-  }
-  .masada-serit::-webkit-scrollbar { display: none; }
-  .masada-serit.cekiliyor { cursor: grabbing; scroll-snap-type: none; }
-  .masada-serit.cekiliyor * { pointer-events: none; }
-  .masada-kare { scroll-snap-align: start; display: grid; gap: 14px; }
-  .masada-gorsel { overflow: hidden; background: var(--kutu); border-radius: 14px; }
-  .masada-gorsel :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; transition: transform 1.1s var(--hiz); }
-  .masada-kare:hover .masada-gorsel :global(img) { transform: scale(1.03); }
-  .masada-yazi { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; font-size: 14px; }
-  .masada-yazi strong { font-size: 12.5px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; }
-  .masada-yazi span:last-child { grid-column: 2; }
-  .masada-alt { margin-top: 28px; }
-  .ilerleme { height: 1px; background: var(--cizgi); overflow: hidden; }
-  .ilerleme span { display: block; height: 100%; background: var(--yazi); width: 20%; }
-  @media (max-width: 760px) {
-    .masada-yan { justify-items: start; }
-    .masada-ok { display: none; }
-    .masada-serit { grid-auto-columns: 78vw; gap: 12px; }
-  }
-
-  /* ---------------------------------------------------------------- malzeme dizisi */
-  .yuzeyler { padding-bottom: clamp(40px, 6vw, 80px); }
-  .dizi { display: grid; grid-template-columns: repeat(var(--sutun, 5), minmax(0, 1fr)); border-block: 1px solid var(--c); }
-  .dizi-oge { border-right: 1px solid var(--c); min-width: 0; }
-  .dizi-oge:last-child { border-right: 0; }
-  .dizi-oge.yeni-grup { border-left: 1px solid var(--cizgi-guclu); }
-  .dizi-yazi { display: grid; gap: 3px; padding: 0 14px 20px; font-size: 13px; }
-  .dizi-ad { font-size: 12px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; }
-  .dizi-ipucu { padding-top: 18px; }
-  @media (max-width: 1000px) {
-    .dizi { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 44vw; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-    .dizi-oge { scroll-snap-align: start; }
-    .dizi-ipucu { display: none; }
-  }
-  @media (hover: none) { .dizi-ipucu { display: none; } }
-
-  /* ---------------------------------------------------------------- atölye */
-  .atolye { padding-bottom: clamp(48px, 7vw, 100px); }
-  .atolye-izgara { display: grid; grid-template-columns: 2fr 1fr; grid-auto-rows: minmax(0, 1fr); gap: 10px; }
-  .atolye-kare { border-radius: 14px; aspect-ratio: 16 / 9; }
-  .atolye-kare.genis { grid-row: span 2; aspect-ratio: auto; min-height: 100%; }
-  .atolye-kare img { position: absolute; inset: 0; }
-  .atolye-kare figcaption { position: absolute; left: 16px; bottom: 14px; z-index: 1; color: var(--yazi); text-shadow: 0 1px 14px rgb(0 0 0 / .7); }
-  @media (max-width: 760px) {
-    .atolye-izgara { grid-template-columns: 1fr; }
-    .atolye-kare.genis { grid-row: auto; aspect-ratio: 16 / 9; }
-  }
-
-  /* ---------------------------------------------------------------- hikâye */
-  .hikaye { padding-block: clamp(64px, 10vw, 150px); }
-  .hikaye-ic {
-    display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px clamp(32px, 6vw, 110px);
-    grid-template-areas: 'no no' 'baslik gorsel' 'metin gorsel' 'olgu olgu';
-  }
-  .hikaye-ic .bolum-no { grid-area: no; }
-  .hikaye-baslik { grid-area: baslik; font-size: clamp(52px, 7.6vw, 128px); line-height: .95; max-width: 9ch; }
-  .hikaye-metin { grid-area: metin; display: grid; gap: 16px; max-width: 54ch; font-size: 17px; color: var(--ikinci); }
-  .hikaye-gorsel { grid-area: gorsel; display: grid; gap: 12px; align-self: start; }
-  .hikaye-gorsel img, .hikaye-gorsel :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
-  .olgular { grid-area: olgu; display: flex; flex-wrap: wrap; gap: 14px 40px; padding-top: 28px; border-top: 1px solid var(--cizgi); color: var(--soluk); }
-  .olgular li { display: flex; align-items: center; gap: 10px; }
-  .olgular :global(.isaret) { width: 9px; height: 9px; color: var(--yazi); }
-  @media (max-width: 900px) {
-    .hikaye-ic { grid-template-columns: 1fr; grid-template-areas: 'no' 'baslik' 'metin' 'gorsel' 'olgu'; }
-  }
+  .suzgec button { color: var(--soluk); padding-bottom: 4px; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+  .suzgec button:hover { color: var(--yazi); }
+  .suzgec button[aria-pressed='true'] { color: var(--yazi); border-color: var(--yazi); }
+  .satir { text-align: center; font-size: 13px; padding: 14px 0 clamp(36px, 5vw, 64px); }
+  @media (prefers-reduced-motion: reduce) { .kaydir i::after { animation: none; transform: none; } }
 </style>

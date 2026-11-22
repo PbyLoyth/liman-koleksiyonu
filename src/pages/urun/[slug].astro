@@ -1,0 +1,73 @@
+---
+import Taban from '../../layouts/Taban.astro';
+import Kart from '../../components/Kart.astro';
+import { marka, urunler, koleksiyonBul, kod } from '../../data/koleksiyon.js';
+import { dikey, yol } from '../../data/gorsel.js';
+
+export function getStaticPaths() {
+  return urunler.map((u) => ({ params: { slug: u.slug }, props: { u } }));
+}
+const { u } = Astro.props;
+const k = koleksiyonBul(u.koleksiyon);
+const ana = dikey(`${u.slug}-ana`);
+const detay = dikey(`${u.slug}-detay`);
+const digerleri = urunler.filter((d) => d.koleksiyon === u.koleksiyon && d.slug !== u.slug).slice(0, 4);
+---
+<Taban baslik={`${u.ad} · ${u.rol} — ${marka.ad}`} aciklama={`${u.rol}, ${u.malzeme.toLocaleLowerCase('tr-TR')}. ${u.metin}`} gorsel={yol(`g/${u.slug}-ana-1200.webp`)}>
+  <article class="kap urun">
+    <div class="gorseller">
+      <figure style={`view-transition-name: u-${u.slug}`}>
+        <img src={ana.src} srcset={ana.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={`${u.ad}: ${u.rol.toLocaleLowerCase('tr-TR')}, ${u.malzeme.toLocaleLowerCase('tr-TR')}`} fetchpriority="high" decoding="async" />
+      </figure>
+      <figure>
+        <img src={detay.src} srcset={detay.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={`${u.ad}, yakın ayrıntı`} loading="lazy" decoding="async" />
+      </figure>
+    </div>
+    <div class="bilgi">
+      <div class="yapiskan">
+        <a class="harf soluk" href={`${yol('')}#${k.id}`}>{k.ad}</a>
+        <h1 class="urun-ad">{u.ad}</h1>
+        <p class="soluk">{u.rol} · {u.malzeme}</p>
+        <p class="metin">{u.metin}</p>
+        <dl class="oz">
+          <div><dt class="harf soluk">No</dt><dd>{kod(u)}</dd></div>
+          <div><dt class="harf soluk">Koleksiyon</dt><dd>{k.ad} — {k.satir}</dd></div>
+          <div><dt class="harf soluk">Malzeme</dt><dd>{u.malzeme}. Tek malzeme, boya ve kaplama yok.</dd></div>
+          <div><dt class="harf soluk">Durum</dt><dd>Konsept. Henüz üretimde değil.</dd></div>
+        </dl>
+        <a class="harf geri" href={yol('')}>← Bütün nesneler</a>
+      </div>
+    </div>
+  </article>
+
+  {digerleri.length > 0 && (
+    <section class="kap benzer" aria-labelledby="benzer-bas">
+      <h2 id="benzer-bas" class="harf">{k.ad} koleksiyonundan</h2>
+      <ul class="izgara">{digerleri.map((d) => <Kart u={d} />)}</ul>
+    </section>
+  )}
+</Taban>
+
+<style>
+  .urun {
+    display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr); gap: clamp(28px, 5vw, 96px);
+    padding-top: clamp(16px, 2vw, 32px);
+  }
+  .gorseller { display: grid; gap: 12px; }
+  .gorseller figure { aspect-ratio: 4 / 5; overflow: hidden; background: var(--siyah); }
+  .gorseller img { width: 100%; height: 100%; object-fit: cover; }
+  .yapiskan { position: sticky; top: calc(var(--ust) + 32px); display: grid; gap: 14px; padding-top: 24px; }
+  .urun-ad { font-size: clamp(34px, 3.6vw, 52px); font-weight: 600; letter-spacing: -0.026em; line-height: 1.06; margin-top: 6px; }
+  .metin { font-size: 15px; max-width: 46ch; margin-top: 10px; }
+  .oz { border-top: 1px solid var(--cizgi); margin-top: 18px; }
+  .oz div { display: grid; grid-template-columns: 7.5em 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--cizgi); font-size: 13px; }
+  .oz dt { padding-top: 1px; }
+  .geri { margin-top: 18px; color: var(--soluk); transition: color .2s; }
+  .geri:hover { color: var(--yazi); }
+  .benzer { padding-top: clamp(80px, 10vw, 140px); }
+  .benzer h2 { text-align: center; margin-bottom: 40px; }
+  @media (max-width: 960px) {
+    .urun { grid-template-columns: 1fr; }
+    .yapiskan { position: static; padding-top: 4px; }
+  }
+</style>

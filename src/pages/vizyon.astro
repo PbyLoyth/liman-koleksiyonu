@@ -1,0 +1,125 @@
+---
+import Taban from '../layouts/Taban.astro';
+import Amblem from '../components/Amblem.astro';
+import { marka, manifesto, muhur, koleksiyonlar, malzemeler, urunler, yontem } from '../data/koleksiyon.js';
+import { genis, yol, var_ } from '../data/gorsel.js';
+const kapak = genis('kampanya-fabrika');
+const muhurFoto = var_('amblem', 1024);
+---
+<Taban baslik={`Vizyon — ${marka.ad}`} aciklama={`${marka.tutku} ${manifesto[0]} ${manifesto[3]}`}>
+  <figure class="kapak">
+    <img src={kapak.src} srcset={kapak.srcset} sizes="100vw" width="1536" height="864" alt="Çelik nesneler karanlık bir fabrikada, ağır çelik tezgâhın üstünde" fetchpriority="high" decoding="async" />
+  </figure>
+
+  <section class="kap dar acilis">
+    <p class="harf soluk">{marka.koleksiyon}</p>
+    <h1 class="baslik ekran">{marka.tutku}</h1>
+    <div class="manifesto">{manifesto.map((p) => <p>{p}</p>)}</div>
+  </section>
+
+  <section class="kap bolum muhur" aria-labelledby="muhur-bas">
+    <figure class="muhur-gorsel">
+      {muhurFoto
+        ? <img src={yol('g/amblem-1024.webp')} srcset={`${yol('g/amblem-512.webp')} 512w, ${yol('g/amblem-1024.webp')} 1024w`} sizes="(min-width: 900px) 40vw, 80vw" width="1024" height="1024" alt="Savana Season mührü: alevler içinde kararmış çelikten gotik haç" loading="lazy" decoding="async" />
+        : <span class="muhur-vektor"><Amblem kor /></span>}
+    </figure>
+    <div class="muhur-metin">
+      <h2 id="muhur-bas" class="harf">{muhur.baslik}</h2>
+      {muhur.metin.map((p) => <p>{p}</p>)}
+    </div>
+  </section>
+
+  <section class="kap bolum" aria-labelledby="kaynak-bas">
+    <h2 id="kaynak-bas" class="harf ortali">Üç kaynak</h2>
+    <ul class="kaynaklar">
+      {koleksiyonlar.map((k) => {
+        const g = genis(k.gorsel);
+        const n = urunler.filter((u) => u.koleksiyon === k.id).length;
+        return (
+          <li>
+            <a href={`${yol('')}#${k.id}`}>
+              <figure class="kaynak-gorsel"><img src={g.src} srcset={g.srcset} sizes="(min-width: 900px) 32vw, 100vw" width="1536" height="864" alt={`${k.ad}: ${k.satir}`} loading="lazy" decoding="async" /></figure>
+              <h3 class="harf">{k.ad} <span class="soluk">· {n} nesne</span></h3>
+              <p class="satir">{k.satir}</p>
+              <p class="soluk">{k.metin}</p>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+
+  <section class="kap dar bolum" aria-labelledby="malzeme-bas">
+    <h2 id="malzeme-bas" class="harf ortali">İki malzeme</h2>
+    <div class="malzemeler">
+      {malzemeler.map((m) => (
+        <div class="malzeme">
+          <h3 class="malzeme-ad">{m.ad}</h3>
+          <p class="soluk">{m.metin}</p>
+          <dl>{m.turler.map(([a, t]) => <div><dt class="harf">{a}</dt><dd class="soluk">{t}</dd></div>)}</dl>
+        </div>
+      ))}
+    </div>
+    <p class="kural">{marka.slogan} Bir nesne ya baştan sona betondur ya baştan sona çelik; ikisi bir nesnede buluşmaz.</p>
+  </section>
+
+  <section class="kap bolum" aria-labelledby="yontem-bas">
+    <h2 id="yontem-bas" class="harf ortali">Yöntem</h2>
+    <ul class="yontem">
+      {yontem.filter(([ad]) => var_(ad, 1536)).map(([ad, baslik, metin]) => {
+        const g = genis(ad);
+        return (
+          <li>
+            <figure class="yontem-gorsel"><img src={g.src} srcset={g.srcset} sizes="(min-width: 900px) 32vw, 100vw" width="1536" height="864" alt={`${baslik}: ${metin}`} loading="lazy" decoding="async" /></figure>
+            <h3 class="harf">{baslik}</h3>
+            <p class="soluk">{metin}</p>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+
+  <section class="kap dar bolum durum" aria-labelledby="durum-bas">
+    <h2 id="durum-bas" class="harf ortali">Durum</h2>
+    <p>Bu bir konsept koleksiyon: fikir, yön ve tutku. Nesneler henüz üretimde değil.</p>
+    <p class="soluk">Sıradaki adım ilk kalıplar ve ilk çelik kesimleri. Hangi nesnenin önce döküleceğini bu koleksiyon belirleyecek.</p>
+    <a class="harf geri" href={yol('')}>← Bütün nesneler</a>
+  </section>
+</Taban>
+
+<style>
+  .kapak { height: min(70svh, 56.25vw); min-height: 300px; overflow: hidden; }
+  .kapak img { width: 100%; height: 100%; object-fit: cover; }
+  .dar { max-width: 860px; }
+  .ortali { text-align: center; }
+  .acilis { text-align: center; padding-top: clamp(64px, 8vw, 120px); display: grid; gap: 22px; justify-items: center; }
+  .baslik { font-size: clamp(38px, 5.6vw, 80px); line-height: 1.04; }
+  .manifesto { display: grid; gap: 16px; font-size: 17px; line-height: 1.7; max-width: 60ch; margin-top: 12px; }
+  .bolum { padding-top: clamp(88px, 11vw, 160px); }
+  .bolum > h2 { margin-bottom: 40px; }
+  .kaynaklar, .yontem { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 14px; }
+  .kaynaklar a { display: grid; gap: 8px; }
+  .kaynak-gorsel, .yontem-gorsel { aspect-ratio: 16 / 10; overflow: hidden; margin-bottom: 10px; }
+  .kaynak-gorsel img, .yontem-gorsel img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--yavas); }
+  .kaynaklar a:hover img { transform: scale(1.03); }
+  .satir { font-size: 16px; }
+  .malzemeler { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .malzeme { display: grid; gap: 12px; align-content: start; }
+  .malzeme-ad { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .malzeme dl { border-top: 1px solid var(--cizgi); }
+  .malzeme dl div { display: grid; grid-template-columns: 6em 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--cizgi); font-size: 13px; }
+  .kural { text-align: center; margin-top: 40px; font-size: 15px; }
+  .muhur { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 80px); align-items: center; max-width: 1180px; }
+  .muhur-gorsel { aspect-ratio: 1; overflow: hidden; display: grid; place-items: center; background: var(--siyah); }
+  .muhur-gorsel img { width: 100%; height: 100%; object-fit: cover; }
+  .muhur-vektor { font-size: min(30vw, 260px); display: grid; place-items: center; }
+  .muhur-metin { display: grid; gap: 16px; font-size: 16px; line-height: 1.7; max-width: 46ch; }
+  .durum { display: grid; gap: 14px; text-align: center; justify-items: center; font-size: 15px; }
+  .geri { margin-top: 12px; color: var(--soluk); transition: color .2s; }
+  .geri:hover { color: var(--yazi); }
+  @media (max-width: 900px) {
+    .kaynaklar, .yontem { grid-template-columns: 1fr; }
+    .malzemeler { grid-template-columns: 1fr; }
+    .muhur { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  }
+</style>

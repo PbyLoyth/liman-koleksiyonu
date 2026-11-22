@@ -1,20 +1,19 @@
 ---
-import Base from '../layouts/Base.astro';
-import { yol } from '../data/yol.js';
+import Taban from '../layouts/Taban.astro';
+import Amblem from '../components/Amblem.astro';
+import { yol } from '../data/gorsel.js';
 ---
-<Base baslik="Sayfa bulunamadı — Savana Season" ton="koyu">
-  <section class="bos koyu" data-ton="koyu">
-    <p class="mono soluk">Hata 404</p>
-    <h1 class="baslik">Kayıp taş.</h1>
-    <p class="soluk">Bu sayfa burada değil; bağlantı değişmiş olabilir.</p>
-    <a class="dugme" href={yol('')}>Ana sayfaya dön</a>
+<Taban baslik="Bulunamadı — Savana Season">
+  <section class="kap bos">
+    <span class="bos-muhur"><Amblem kor /></span>
+    <p class="harf soluk">404</p>
+    <h1 class="harf">Bu sayfa burada değil</h1>
+    <a class="harf soluk" href={yol('')}>← Bütün nesneler</a>
   </section>
-</Base>
+</Taban>
 
 <style>
-  .bos {
-    min-height: 88svh; display: grid; place-content: center; justify-items: center; gap: 22px;
-    text-align: center; padding: calc(var(--ub-y) + 40px) var(--kenar) 80px;
-  }
-  .bos h1 { font-size: clamp(56px, 9vw, 140px); }
+  .bos { min-height: 64svh; display: grid; place-content: center; justify-items: center; gap: 18px; text-align: center; }
+  .bos-muhur { font-size: 72px; margin-bottom: 18px; }
+  .bos a:hover { color: var(--yazi); }
 </style>

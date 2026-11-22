@@ -1,0 +1,111 @@
+---
+// Üst şerit (Chrome Hearts düzeni): solda mühür (menüyü açar), ortada yazı logosu, sağda Vizyon.
+// saydam: ana sayfada giriş videosunun üstünde saydam ve büyük durur; aşağı kayınca siyaha döner ve küçülür.
+import Amblem from './Amblem.astro';
+import { marka, koleksiyonlar } from '../data/koleksiyon.js';
+import { yol } from '../data/gorsel.js';
+interface Props { saydam?: boolean }
+const { saydam = false } = Astro.props;
+---
+<header class:list={['ust', { saydam }]} data-ust>
+  <button class="ust-muhur" type="button" aria-label="Menüyü aç" aria-haspopup="dialog" aria-controls="menu" data-menu-ac>
+    <Amblem kor />
+  </button>
+  <a class="marka ust-marka" href={yol('')} aria-label="Savana Season, ana sayfa">Savana Season</a>
+  <nav class="ust-sag" aria-label="Sayfalar">
+    <a class="harf" href={yol('vizyon/')}>Vizyon</a>
+  </nav>
+</header>
+
+<dialog class="menu" id="menu" aria-label="Menü">
+  <div class="menu-ust">
+    <span class="menu-muhur"><Amblem kor /></span>
+    <span class="marka menu-marka" aria-hidden="true">Savana Season</span>
+    <button class="harf menu-kapat" type="button" data-menu-kapat>Kapat</button>
+  </div>
+  <nav class="menu-yollar" aria-label="Menü">
+    <a href={`${yol('')}#koleksiyon`}>Bütün nesneler</a>
+    {koleksiyonlar.map((k) => <a href={`${yol('')}#${k.id}`}>{k.ad}</a>)}
+    <a href={yol('vizyon/')}>Vizyon</a>
+  </nav>
+  <p class="harf soluk menu-alt">{marka.tutku}</p>
+</dialog>
+
+<script>
+  const menu = document.getElementById('menu') as HTMLDialogElement;
+  document.querySelector('[data-menu-ac]')!.addEventListener('click', () => menu.showModal());
+  menu.querySelector('[data-menu-kapat]')!.addEventListener('click', () => menu.close());
+  menu.addEventListener('click', (e) => {
+    const a = (e.target as HTMLElement).closest('a');
+    if (a) {
+      // aynı sayfada aynı bağlantı: hash değişmez, süzgeci yine de tetikle
+      if (a.pathname === location.pathname && a.hash === location.hash) dispatchEvent(new HashChangeEvent('hashchange'));
+      menu.close();
+    }
+  });
+
+  // Ana sayfada şerit giriş görselinin üstünde saydam; giriş geride kalınca siyah
+  const ust = document.querySelector<HTMLElement>('[data-ust]')!;
+  const giris = document.querySelector('[data-giris]');
+  if (ust.classList.contains('saydam') && giris) {
+    new IntersectionObserver(([e]) => ust.classList.toggle('dolu', !e.isIntersecting), { rootMargin: '-72px 0px 0px 0px' }).observe(giris);
+  } else {
+    ust.classList.add('dolu');
+  }
+</script>
+
+<style>
+  .ust {
+    position: sticky; top: 0; z-index: 30; height: var(--ust);
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+    padding-inline: var(--kenar); background: var(--siyah);
+    transition: background-color .5s, height .5s var(--yavas);
+  }
+  .ust.saydam { position: fixed; inset: 0 0 auto; height: 96px; background: transparent; }
+  .ust.saydam::before {
+    content: ''; position: absolute; inset: 0 0 -48px; z-index: -1; pointer-events: none;
+    background: linear-gradient(rgb(0 0 0 / 0.62), transparent); transition: opacity .5s;
+  }
+  .ust.saydam.dolu { height: var(--ust); background: var(--siyah); }
+  .ust.saydam.dolu::before { opacity: 0; }
+
+  .ust-muhur { justify-self: start; display: grid; place-items: center; width: 40px; height: 40px; margin-left: -8px; font-size: 24px; color: var(--yazi); }
+  .ust-muhur:hover :global(.kor::before) { animation-duration: 1.6s; }
+  .ust-marka { font-size: 34px; white-space: nowrap; transition: transform .5s var(--yavas); }
+  .ust.saydam:not(.dolu) .ust-marka { transform: scale(1.32); }
+  .ust-sag { justify-self: end; }
+  .ust-sag a { color: var(--soluk); transition: color .2s; }
+  .ust.saydam:not(.dolu) .ust-sag a { color: var(--yazi); }
+  .ust-sag a:hover { color: var(--yazi); }
+
+  .menu {
+    position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+    margin: 0; padding: 0 var(--kenar); border: 0; background: var(--siyah); color: var(--yazi);
+  }
+  .menu::backdrop { background: var(--siyah); }
+  .menu[open] { display: grid; grid-template-rows: auto 1fr auto; animation: menu-gel .5s var(--yavas); }
+  .menu-ust { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: var(--ust); }
+  .menu-muhur { font-size: 24px; }
+  .menu-marka { font-size: 34px; }
+  .menu-kapat { justify-self: end; color: var(--soluk); transition: color .2s; }
+  .menu-kapat:hover { color: var(--yazi); }
+  .menu-yollar { display: grid; place-content: center; justify-items: center; gap: clamp(10px, 2vh, 18px); }
+  .menu-yollar a {
+    font-size: clamp(30px, 4.4vw, 54px); font-weight: 600; letter-spacing: -0.026em;
+    line-height: 1.12; color: var(--soluk); transition: color .2s;
+  }
+  .menu-yollar a:hover, .menu-yollar a:focus-visible { color: var(--yazi); }
+  .menu-alt { text-align: center; padding-bottom: 28px; }
+  @keyframes menu-gel { from { opacity: 0; } }
+  :global(html:has(.menu[open])) { overflow: hidden; }
+
+  @media (max-width: 720px) {
+    .ust.saydam { height: 76px; }
+    .ust-marka, .menu-marka { font-size: 26px; }
+    .ust.saydam:not(.dolu) .ust-marka { transform: scale(1.18); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ust, .ust-marka, .ust.saydam::before { transition: none; }
+    .menu[open] { animation: none; }
+  }
+</style>

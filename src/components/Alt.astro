@@ -1,0 +1,33 @@
+---
+// Alt bilgi: mühür (alevli haç), tutku cümlesi, malzeme kuralı, bağlantılar
+import Amblem from './Amblem.astro';
+import { marka, koleksiyonlar } from '../data/koleksiyon.js';
+import { yol, var_ } from '../data/gorsel.js';
+const muhur = var_('amblem', 512);
+---
+<footer class="alt kap">
+  {muhur
+    ? <img class="alt-muhur" src={yol('g/amblem-256.webp')} srcset={`${yol('g/amblem-256.webp')} 1x, ${yol('g/amblem-512.webp')} 2x`} width="112" height="112" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    : <span class="alt-muhur alt-vektor"><Amblem kor /></span>}
+  <p class="alt-tutku ekran">{marka.tutku}</p>
+  <p class="harf soluk">{marka.slogan}</p>
+  <nav class="alt-yollar" aria-label="Alt bağlantılar">
+    {koleksiyonlar.map((k) => <a class="harf" href={`${yol('')}#${k.id}`}>{k.ad}</a>)}
+    <a class="harf" href={yol('vizyon/')}>Vizyon</a>
+  </nav>
+  <p class="alt-not soluk">© {new Date().getFullYear()} {marka.ad} · {marka.koleksiyon}. Nesneler henüz üretimde değil.</p>
+</footer>
+
+<style>
+  .alt {
+    display: grid; justify-items: center; gap: 16px; text-align: center;
+    margin-top: clamp(96px, 12vw, 180px); padding-block: 56px 40px; border-top: 1px solid var(--cizgi);
+  }
+  .alt-muhur { width: 112px; height: 112px; margin-bottom: 4px; }
+  .alt-vektor { display: grid; place-items: center; font-size: 44px; }
+  .alt-tutku { font-size: clamp(22px, 2.2vw, 30px); }
+  .alt-yollar { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 28px; margin-top: 8px; }
+  .alt-yollar a { color: var(--soluk); transition: color .2s; }
+  .alt-yollar a:hover { color: var(--yazi); }
+  .alt-not { max-width: 62ch; font-size: 12px; }
+</style>
