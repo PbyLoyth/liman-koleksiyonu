@@ -8,8 +8,9 @@ import Alt from '../components/Alt.astro';
 import { marka } from '../data/koleksiyon.js';
 import { yol } from '../data/gorsel.js';
 
-interface Props { baslik?: string; aciklama?: string; gorsel?: string; saydam?: boolean; }
-const { baslik = `${marka.ad} — ${marka.tutku}`, aciklama = marka.aciklama, gorsel, saydam = false } = Astro.props;
+// dizin: false → arama motorlarına kapalı (arşiv gibi gizli sayfalar)
+interface Props { baslik?: string; aciklama?: string; gorsel?: string; saydam?: boolean; dizin?: boolean; }
+const { baslik = `${marka.ad} — ${marka.tutku}`, aciklama = marka.aciklama, gorsel, saydam = false, dizin = true } = Astro.props;
 const kanonik = new URL(Astro.url.pathname, Astro.site).href;
 const og = new URL(gorsel ?? yol('og.jpg'), Astro.site).href;
 ---
@@ -21,6 +22,7 @@ const og = new URL(gorsel ?? yol('og.jpg'), Astro.site).href;
     <title>{baslik}</title>
     <meta name="description" content={aciklama} />
     <link rel="canonical" href={kanonik} />
+    {!dizin && <meta name="robots" content="noindex, nofollow, noarchive" />}
     <meta name="theme-color" content="#000000" />
     <meta name="color-scheme" content="dark" />
     <link rel="preload" href={kara} as="font" type="font/woff2" crossorigin />
