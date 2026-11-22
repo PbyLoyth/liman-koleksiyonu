@@ -35,7 +35,7 @@ const renk2 = (u.renkler ?? '').split(' · ')[1];
           <div><dt class="harf soluk">No</dt><dd>{kod(u)}</dd></div>
           <div><dt class="harf soluk">Koleksiyon</dt><dd>{k.ad} — {k.satir}</dd></div>
           {giyim
-            ? <><div><dt class="harf soluk">Kumaş</dt><dd>{u.malzeme}</dd></div><div><dt class="harf soluk">Renk</dt><dd>{u.renkler}</dd></div></>
+            ? <><div><dt class="harf soluk">{u.malzemeAd ?? 'Kumaş'}</dt><dd>{u.malzeme}</dd></div><div><dt class="harf soluk">Renk</dt><dd>{u.renkler}</dd></div></>
             : <div><dt class="harf soluk">Malzeme</dt><dd>{u.malzeme}. Tek malzeme, boya ve kaplama yok.</dd></div>}
           <div><dt class="harf soluk">Durum</dt><dd>Konsept. Henüz üretimde değil.</dd></div>
         </dl>

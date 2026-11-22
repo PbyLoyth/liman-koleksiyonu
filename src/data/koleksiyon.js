@@ -41,7 +41,7 @@ export const koleksiyonlar = [
     id: 'liman',
     ad: 'Liman',
     satir: 'Suya karşı duran beton.',
-    metin: 'Fener, dalgakıran, iskele babası, keson, silo, rıhtım, antifer. Limanın ağır, sessiz yapıları; ışığı taşır, dalgayı kırar, halatı tutar, yükü saklar. V2 nesneleri koleksiyonun ilk çizimlerinden döner.',
+    metin: 'Dalgakıran, iskele babası, keson, silo, rıhtım, antifer. Limanın ağır, sessiz yapıları; dalgayı kırar, halatı tutar, yükü saklar.',
     gorsel: 'kampanya-liman',
   },
   {
@@ -56,7 +56,7 @@ export const koleksiyonlar = [
     ad: 'Giyim',
     tur: 'giyim',
     satir: 'Sade, ağır, imzalı.',
-    metin: 'Boxer ve şorttan kapüşonluya, formadan şişme monta: sade kesimler, ağır kumaşlar. İmza hep aynı: Old English Savana Season ve haç.',
+    metin: 'Boxer ve şorttan motokros formasına ve arazi kaskına: sade kesimler, ağır kumaşlar. İmza hep aynı: Old English Savana Season ve haç.',
   },
 ];
 
@@ -80,7 +80,7 @@ export const malzemeler = [
   },
 ];
 
-// 21 nesne ve 13 giyim. kod: koleksiyonun baş harfi ve sıra. Giyimde iki renk: ana görsel ilk renk, ikinci görsel öbür renk
+// 17 nesne ve giyim. kod: koleksiyonun baş harfi ve sıra. Giyimde iki renk: ana görsel ilk renk, ikinci görsel öbür renk
 export const urunler = [
   // Katedral
   { slug: 'kemer', ad: 'Kemer', koleksiyon: 'katedral', rol: 'Kitap desteği', malzeme: 'Brüt beton',
@@ -94,24 +94,16 @@ export const urunler = [
   { slug: 'demet', ad: 'Demet', koleksiyon: 'katedral', rol: 'Vazo', malzeme: 'Grafit beton',
     metin: 'İnce sütunların birleşip tek ayak olduğu gotik taşıyıcı: sekiz yumuşak oluk, sekizgen başlık.' },
   // Liman
-  { slug: 'fener', ad: 'Fener', koleksiyon: 'liman', rol: 'Mum feneri', malzeme: 'Tuz beton',
-    metin: 'Liman fenerinden küçültüldü: on iki yüzlü taban, karo derzli kule, galeri halkası. Tepedeki beton fener odasına bir tealight girer; ışık üç yarıktan sızar.' },
   { slug: 'dalgakiran', ad: 'Dalgakıran', koleksiyon: 'liman', rol: 'Kitap desteği', malzeme: 'Brüt beton',
     metin: 'Dört bacaklı dalgakıran bloğu, çift. Üç bacağının üstünde durur; kitaplar dik bacağa yaslanır.' },
-  { slug: 'dalgakiran-v2', ad: 'Dalgakıran V2', koleksiyon: 'liman', rol: 'Kitap desteği', malzeme: 'Tuz beton',
-    metin: 'Koleksiyonun ilk Dalgakıran’ı: dört konik bacaklı tetrapod, bacaklarında karo derzi. Çift durur; dalgayı kıran biçim kitapları tutar.' },
   { slug: 'baba', ad: 'Baba', koleksiyon: 'liman', rol: 'Şamdan', malzeme: 'Kara çelik',
     metin: 'İskele babası, iki boy. Halat yerine ince mum tutar.' },
   { slug: 'keson', ad: 'Keson', koleksiyon: 'liman', rol: 'Valet tepsisi', malzeme: 'Grafit beton',
     metin: 'Dalgakıranın hücreli beton kutusu. Yüzük, saat ve bozuk para için ayrı hücreler.' },
-  { slug: 'keson-v2', ad: 'Keson V2', koleksiyon: 'liman', rol: 'Valet tepsisi', malzeme: 'Tuz beton',
-    metin: 'İlk Keson: kalın duvarlı, hücreli bir liman kesonu. Telefon, kulaklık ve yüzük için ayrı gözler; dış yüzlerde karo derzi.' },
   { slug: 'silo', ad: 'Silo', koleksiyon: 'liman', rol: 'Kalemlik', malzeme: 'Tuz beton',
     metin: 'Yan yana kaynaşmış üç liman silosu, üç ayrı bölme: kalem, makas, fırça.' },
   { slug: 'rihtim', ad: 'Rıhtım', koleksiyon: 'liman', rol: 'Tütsülük', malzeme: 'Brüt beton',
     metin: 'Rıhtım duvarı ve üstünde küçük bir baba. Tütsü babada durur, külü kanala düşer.' },
-  { slug: 'rihtim-v2', ad: 'Rıhtım V2', koleksiyon: 'liman', rol: 'Tütsülük', malzeme: 'Tuz beton',
-    metin: 'İlk Rıhtım: uzun, alçak bir rıhtım duvarı. Tütsü uçtaki küçük babada durur, külü boydan boya uzanan kanala düşer; yanlarda karo derzi.' },
   { slug: 'antifer', ad: 'Antifer', koleksiyon: 'liman', rol: 'Kâğıt ağırlığı', malzeme: 'Ayna çelik',
     metin: 'Dört yüzü oluklu dalgakıran küpü, parlatılmış çelikten. Ağır, küçük, sessiz.' },
   // Fabrika
@@ -129,31 +121,21 @@ export const urunler = [
     metin: 'Fabrika bacasının tepesinde gotik bir kule. Duman sivri yarıklardan çıkar.' },
   // Giyim
   { slug: 'bandana-boxer', ad: 'Bandana Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve elastan', renkler: 'Kara · Kemik',
-    metin: 'Her yanı klasik paisley. Jakar bel lastiğinde Old English Savana Season ve haç tekrarı.' },
-  { slug: 'bandana-sort', ad: 'Bandana Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Pamuk poplin', renkler: 'Kara · Kemik',
-    metin: 'Bandana kareleri yan yana; kenar şeritleri birbirine değer. Büzgülü bel, metal uçlu kordon, bacakta dokuma etiket.' },
-  { slug: 'kamuflaj-boxer', ad: 'Kamuflaj Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve elastan', renkler: 'Beton · Savana',
-    metin: 'Savana Season kamuflajı: Beton gri tonlarda, Savana kum, okra ve zeytinde. Kara jakar bel.' },
-  { slug: 'kamuflaj-sort', ad: 'Kamuflaj Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ripstop pamuk', renkler: 'Beton · Savana',
-    metin: 'Dikişsiz kamuflaj deseni, büzgülü bel ve kara kordon. Bacakta dokuma etiket.' },
+    metin: 'Bandana karesi önde ortalanır: madalyon önde, bordür yanlarda. Kara jakar bel lastiğinde Old English Savana Season ve haç tekrarı.' },
+  { slug: 'bandana-sort', ad: 'Bandana Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ağır triko', renkler: 'Kara · Kemik',
+    metin: 'Ağır triko üstünde dağınık bandana madalyonları. Çift çizgili ribana paça, büzgülü bel ve kordon, dokuma etiket.' },
+  { slug: 'kamuflaj-boxer', ad: 'Kamuflaj Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve elastan', renkler: 'Savana · Beton',
+    metin: 'Savana Season kamuflajı: Savana kum, zeytin ve toprakta, Beton gri tonlarda. Kara jakar bel lastiği.' },
+  { slug: 'kamuflaj-sort', ad: 'Kamuflaj Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ripstop pamuk', renkler: 'Savana · Beton',
+    metin: 'Geniş kargo kesim: kemer köprüleri, eğik ön cepler, kapaklı körüklü yan cepler, yan ayar tokası. Cebe dikili dokuma etiket.' },
   { slug: 'muhur-boxer', ad: 'Mühür Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve modal', renkler: 'Kara · Kemik',
-    metin: 'Düz renk. Jakar bel lastiği ve bacakta küçük haç nakışı.' },
-  { slug: 'muhur-sort', ad: 'Mühür Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ağır penye', renkler: 'Kara · Beton',
-    metin: 'Geniş kesim, düz renk ağır penye. Bacakta dikişli deri haç yama ve Old English logo nakışı.' },
-  { slug: 'kapusonlu', ad: 'Kapüşonlu', koleksiyon: 'giyim', rol: 'Kapüşonlu', malzeme: 'Ağır pamuk polar', renkler: 'Kara · Beton',
-    metin: 'Bol kesim, ağır kapüşonlu. Göğüste küçük nakış haç; başka hiçbir şey.' },
-  { slug: 'tisort', ad: 'Tişört', koleksiyon: 'giyim', rol: 'Tişört', malzeme: 'Ağır pamuk', renkler: 'Kara · Kemik',
-    metin: 'Bol kesim, kalın yaka, düşük omuz. Göğüste Old English Savana Season baskısı.' },
-  { slug: 'yaris-formasi', ad: 'Yarış Forması', koleksiyon: 'giyim', rol: 'Forma', malzeme: 'Nefes alan file', renkler: 'Kara · Kemik',
-    metin: 'Motokros formasından: yan ve kol panelleri, omuzlarda karo derzi ızgarası. Göğüste Old English logo.' },
-  { slug: 'esofman', ad: 'Eşofman Takımı', koleksiyon: 'giyim', rol: 'Üst ve alt', malzeme: 'Triko', renkler: 'Kara', detayAd: 'alt',
-    metin: 'Tam fermuarlı üst ve düz kesim alt; kol ve bacak boyunca ince kemik şerit. Göğüste logo nakışı, bacakta haç.' },
-  { slug: 'kargo', ad: 'Kargo Pantolon', koleksiyon: 'giyim', rol: 'Pantolon', malzeme: 'Ripstop pamuk', renkler: 'Kara · Beton',
-    metin: 'Geniş kesim kargo, kapaklı yan cepler. Bacakta dokuma etiket.' },
-  { slug: 'sisme-mont', ad: 'Şişme Mont', koleksiyon: 'giyim', rol: 'Mont', malzeme: 'Dolgulu naylon', renkler: 'Kara · Beton',
-    metin: 'Yatay dikişli şişme mont, kapüşonlu yüksek yaka. Göğüste nakış haç.' },
-  { slug: 'sapka', ad: 'Şapka', koleksiyon: 'giyim', rol: 'Şapka', malzeme: 'Yıkanmış pamuk', renkler: 'Kara · Kemik',
-    metin: 'Altı panelli şapka, önde nakış haç.' },
+    metin: 'Düz renk. Belde ortada tek Old English yazı, bacakta küçük haç nakışı.' },
+  { slug: 'muhur-sort', ad: 'Mühür Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Yıkanmış kot', renkler: 'Kara · Beton',
+    metin: 'Geniş kesim yıkanmış kot: beş cep, perçin, marangoz halkası ve D-halka. Uylukta dikişli deri haç yama.' },
+  { slug: 'moto-forma', ad: 'Moto Forma', koleksiyon: 'giyim', rol: 'Forma', malzeme: 'Nefes alan polyester', renkler: 'Kara · Kemik',
+    metin: 'Motokros kesimi. Omuz paneli göğüste gotik bir uçla biter, ortasında yanan haç. Kollarda dikey Old English yazı, file yanlar, uzun arka etek.' },
+  { slug: 'arazi-kaski', ad: 'Arazi Kaskı', koleksiyon: 'giyim', rol: 'Kask', malzeme: 'Kompozit', malzemeAd: 'Kabuk', renkler: 'Kara · Kemik',
+    metin: 'Düz kabuk, kara siperlik ve çene, çenede çelik file. Yanda haç, siperlikte Old English yazı.' },
 ];
 
 export const koleksiyonBul = (id) => koleksiyonlar.find((k) => k.id === id);

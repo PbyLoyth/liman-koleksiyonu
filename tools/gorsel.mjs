@@ -11,12 +11,7 @@ const T5 = `${R}/tur5`;
 
 // Fener ve eski Liman tasarımları (V2): Blender stüdyo karelerinden koleksiyonun fotoğraf diline çevrildi
 // (tools/eski_kaynak.mjs, sonra görsel hattında ara gürültüyle görselden görsel). Değer: renderlar altındaki yol (uzantısız).
-export const ESKI = {
-  fener: { ana: 'tur8/v2-fener-s857-9101', detay: 'tur8/v2-fener-detay-s857-9301' },
-  'dalgakiran-v2': { ana: 'tur8/v2-dalgakiran-s857-9102', detay: 'tur8/v2-dalgakiran-detay-s857-9302' },
-  'keson-v2': { ana: 'tur6/v2-keson-g75-7402', detay: 'tur8/v2-keson-detay-s857-9302' },
-  'rihtim-v2': { ana: 'tur8/v2-rihtim-s857-9101', detay: 'tur8/v2-rihtim-detay-s857-9301' },
-};
+export const ESKI = {};
 // Mühür: Umut'un seçtiği kara-beyaz alevli haç (renderlar/tur5, ilk görsel turu)
 const AMBLEM = `${R}/tur5/amblem-sb-5012.png`;
 
@@ -71,27 +66,22 @@ for (const [slug, s] of Object.entries(ESKI)) {
   await yaz(`${R}/${s.ana}.png`, `${slug}-ana`, [640, 1200], 4 / 5, true);
   await yaz(`${R}/${s.detay}.png`, `${slug}-detay`, [640, 1200], 4 / 5, true);
 }
-// Giyim: özel tasarım klasöründeki fotoğraflar (beton-obje/tasarim/giyim/foto: vektör çizimden ya da boş giysi
-// fotoğrafından üretilip logo işlenmiş); ana görsel ilk renk, ikinci görsel öbür renk. Renkler korunur, kenarlar siyaha söner.
-const GIYIM = process.env.GIYIM_KOK ?? 'C:/projects/beton-obje/tasarim/giyim/foto';
+// Giyim: özel tasarım klasöründeki Seri 2 fotoğrafları (beton-obje/tasarim/giyim/seri2/foto: kalıptan FLUX ile üretilip
+// imzası logo.mjs ile işlenmiş, açık gri e-ticaret zemini); ana görsel ilk renk, ikinci görsel öbür renk. Renk ve zemin korunur.
+const GIYIM = process.env.GIYIM_KOK ?? 'C:/projects/beton-obje/tasarim/giyim/seri2/foto';
 export const GIYIM_GORSEL = {
   'bandana-boxer': ['bandana-boxer-kara', 'bandana-boxer-kemik'],
   'bandana-sort': ['bandana-sort-kara', 'bandana-sort-kemik'],
-  'kamuflaj-boxer': ['kamuflaj-boxer-beton', 'kamuflaj-boxer-savana'],
-  'kamuflaj-sort': ['kamuflaj-sort-beton', 'kamuflaj-sort-savana'],
+  'kamuflaj-boxer': ['kamuflaj-boxer-savana', 'kamuflaj-boxer-beton'],
+  'kamuflaj-sort': ['kamuflaj-sort-savana', 'kamuflaj-sort-beton'],
   'muhur-boxer': ['muhur-boxer-kara', 'muhur-boxer-kemik'],
   'muhur-sort': ['muhur-sort-kara', 'muhur-sort-beton'],
-  kapusonlu: ['kapusonlu-kara', 'kapusonlu-beton'],
-  tisort: ['tisort-kara', 'tisort-kemik'],
-  'yaris-formasi': ['forma-kara', 'forma-kemik'],
-  esofman: ['esofman-ceket', 'esofman-alt'],
-  kargo: ['kargo-kara', 'kargo-beton'],
-  'sisme-mont': ['mont-kara', 'mont-beton'],
-  sapka: ['sapka-kara', 'sapka-kemik'],
+  'moto-forma': ['moto-forma-kara', 'moto-forma-kemik'],
+  'arazi-kaski': ['arazi-kaski-kara', 'arazi-kaski-kemik'],
 };
 for (const [slug, [a, b]] of Object.entries(GIYIM_GORSEL)) {
-  await yaz(`${GIYIM}/${a}.webp`, `${slug}-ana`, [640, 1200], 4 / 5, true, true);
-  await yaz(`${GIYIM}/${b}.webp`, `${slug}-detay`, [640, 1200], 4 / 5, true, true);
+  await yaz(`${GIYIM}/${a}.webp`, `${slug}-ana`, [640, 1200], 4 / 5, false, true);
+  await yaz(`${GIYIM}/${b}.webp`, `${slug}-detay`, [640, 1200], 4 / 5, false, true);
 }
 if (existsSync(AMBLEM)) {
   for (const g of [256, 512, 1024]) {
