@@ -71,9 +71,9 @@ for (const [slug, s] of Object.entries(ESKI)) {
   await yaz(`${R}/${s.ana}.png`, `${slug}-ana`, [640, 1200], 4 / 5, true);
   await yaz(`${R}/${s.detay}.png`, `${slug}-detay`, [640, 1200], 4 / 5, true);
 }
-// Giyim: özel tasarım klasöründeki çizimler (beton-obje/tasarim/giyim, `npm run cizim`); ana görsel ilk renk,
-// ikinci görsel öbür renk. Renkler korunur (Savana kamuflajı renkli), kenarlar siyaha söner.
-const GIYIM = process.env.GIYIM_KOK ?? 'C:/projects/beton-obje/tasarim/giyim/cizim';
+// Giyim: özel tasarım klasöründeki fotoğraflar (beton-obje/tasarim/giyim/foto: vektör çizimden ya da boş giysi
+// fotoğrafından üretilip logo işlenmiş); ana görsel ilk renk, ikinci görsel öbür renk. Renkler korunur, kenarlar siyaha söner.
+const GIYIM = process.env.GIYIM_KOK ?? 'C:/projects/beton-obje/tasarim/giyim/foto';
 export const GIYIM_GORSEL = {
   'bandana-boxer': ['bandana-boxer-kara', 'bandana-boxer-kemik'],
   'bandana-sort': ['bandana-sort-kara', 'bandana-sort-kemik'],
@@ -81,6 +81,13 @@ export const GIYIM_GORSEL = {
   'kamuflaj-sort': ['kamuflaj-sort-beton', 'kamuflaj-sort-savana'],
   'muhur-boxer': ['muhur-boxer-kara', 'muhur-boxer-kemik'],
   'muhur-sort': ['muhur-sort-kara', 'muhur-sort-beton'],
+  kapusonlu: ['kapusonlu-kara', 'kapusonlu-beton'],
+  tisort: ['tisort-kara', 'tisort-kemik'],
+  'yaris-formasi': ['forma-kara', 'forma-kemik'],
+  esofman: ['esofman-ceket', 'esofman-alt'],
+  kargo: ['kargo-kara', 'kargo-beton'],
+  'sisme-mont': ['mont-kara', 'mont-beton'],
+  sapka: ['sapka-kara', 'sapka-kemik'],
 };
 for (const [slug, [a, b]] of Object.entries(GIYIM_GORSEL)) {
   await yaz(`${GIYIM}/${a}.webp`, `${slug}-ana`, [640, 1200], 4 / 5, true, true);

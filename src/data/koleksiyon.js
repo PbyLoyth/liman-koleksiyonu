@@ -55,8 +55,8 @@ export const koleksiyonlar = [
     id: 'giyim',
     ad: 'Giyim',
     tur: 'giyim',
-    satir: 'Bandana, kamuflaj, mühür.',
-    metin: 'Boxer ve şort: klasik paisley ve bandana kareleri, Savana Season kamuflajı ve düz renk Mühür serisi. Bel lastiğinde Old English logo, bacakta haç.',
+    satir: 'Sade, ağır, imzalı.',
+    metin: 'Boxer ve şorttan kapüşonluya, formadan şişme monta: sade kesimler, ağır kumaşlar. İmza hep aynı: Old English Savana Season ve haç.',
   },
 ];
 
@@ -80,7 +80,7 @@ export const malzemeler = [
   },
 ];
 
-// 21 nesne ve 6 giyim. kod: koleksiyonun baş harfi ve sıra. Giyimde iki renk: ana görsel ilk renk, ikinci görsel öbür renk
+// 21 nesne ve 13 giyim. kod: koleksiyonun baş harfi ve sıra. Giyimde iki renk: ana görsel ilk renk, ikinci görsel öbür renk
 export const urunler = [
   // Katedral
   { slug: 'kemer', ad: 'Kemer', koleksiyon: 'katedral', rol: 'Kitap desteği', malzeme: 'Brüt beton',
@@ -139,7 +139,21 @@ export const urunler = [
   { slug: 'muhur-boxer', ad: 'Mühür Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve modal', renkler: 'Kara · Kemik',
     metin: 'Düz renk. Jakar bel lastiği ve bacakta küçük haç nakışı.' },
   { slug: 'muhur-sort', ad: 'Mühür Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ağır penye', renkler: 'Kara · Beton',
-    metin: 'Düz renk ağır penye. Bacakta dikişli deri haç yama ve Old English logo nakışı.' },
+    metin: 'Geniş kesim, düz renk ağır penye. Bacakta dikişli deri haç yama ve Old English logo nakışı.' },
+  { slug: 'kapusonlu', ad: 'Kapüşonlu', koleksiyon: 'giyim', rol: 'Kapüşonlu', malzeme: 'Ağır pamuk polar', renkler: 'Kara · Beton',
+    metin: 'Bol kesim, ağır kapüşonlu. Göğüste küçük nakış haç; başka hiçbir şey.' },
+  { slug: 'tisort', ad: 'Tişört', koleksiyon: 'giyim', rol: 'Tişört', malzeme: 'Ağır pamuk', renkler: 'Kara · Kemik',
+    metin: 'Bol kesim, kalın yaka, düşük omuz. Göğüste Old English Savana Season baskısı.' },
+  { slug: 'yaris-formasi', ad: 'Yarış Forması', koleksiyon: 'giyim', rol: 'Forma', malzeme: 'Nefes alan file', renkler: 'Kara · Kemik',
+    metin: 'Motokros formasından: yan ve kol panelleri, omuzlarda karo derzi ızgarası. Göğüste Old English logo.' },
+  { slug: 'esofman', ad: 'Eşofman Takımı', koleksiyon: 'giyim', rol: 'Üst ve alt', malzeme: 'Triko', renkler: 'Kara', detayAd: 'alt',
+    metin: 'Tam fermuarlı üst ve düz kesim alt; kol ve bacak boyunca ince kemik şerit. Göğüste logo nakışı, bacakta haç.' },
+  { slug: 'kargo', ad: 'Kargo Pantolon', koleksiyon: 'giyim', rol: 'Pantolon', malzeme: 'Ripstop pamuk', renkler: 'Kara · Beton',
+    metin: 'Geniş kesim kargo, kapaklı yan cepler. Bacakta dokuma etiket.' },
+  { slug: 'sisme-mont', ad: 'Şişme Mont', koleksiyon: 'giyim', rol: 'Mont', malzeme: 'Dolgulu naylon', renkler: 'Kara · Beton',
+    metin: 'Yatay dikişli şişme mont, kapüşonlu yüksek yaka. Göğüste nakış haç.' },
+  { slug: 'sapka', ad: 'Şapka', koleksiyon: 'giyim', rol: 'Şapka', malzeme: 'Yıkanmış pamuk', renkler: 'Kara · Kemik',
+    metin: 'Altı panelli şapka, önde nakış haç.' },
 ];
 
 export const koleksiyonBul = (id) => koleksiyonlar.find((k) => k.id === id);

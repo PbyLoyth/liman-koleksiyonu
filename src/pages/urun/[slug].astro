@@ -22,7 +22,7 @@ const renk2 = (u.renkler ?? '').split(' · ')[1];
         <img src={ana.src} srcset={ana.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={`${u.ad}: ${u.rol.toLocaleLowerCase('tr-TR')}, ${u.malzeme.toLocaleLowerCase('tr-TR')}`} fetchpriority="high" decoding="async" />
       </figure>
       <figure>
-        <img src={detay.src} srcset={detay.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={giyim ? `${u.ad}, ${renk2}` : `${u.ad}, yakın ayrıntı`} loading="lazy" decoding="async" />
+        <img src={detay.src} srcset={detay.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={giyim ? `${u.ad}, ${u.detayAd ?? renk2}` : `${u.ad}, yakın ayrıntı`} loading="lazy" decoding="async" />
       </figure>
     </div>
     <div class="bilgi">
