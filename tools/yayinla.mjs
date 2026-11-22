@@ -1,5 +1,6 @@
 // npm run yayinla: siteyi kurar ve dist/ klasörünü gh-pages dalına gönderir (GitHub Pages bu daldan yayınlar).
-// Yayın dalı her seferinde tek işlemle yeniden yazılır; kaynak geçmişi main dalında kalır.
+// Önceki yayın sığ olarak çekilir ve yeni işlem onun üstüne kurulur: yalnız değişen dosyalar gönderilir
+// (binlerce dönüş karesi her yayında yeniden yüklenmez). Kaynak geçmişi main dalında kalır.
 import { execSync } from 'node:child_process';
 import { mkdtempSync, cpSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -13,6 +14,12 @@ try {
   cpSync('dist', gecici, { recursive: true });
   writeFileSync(join(gecici, '.nojekyll'), '');
   sh('git init -q -b gh-pages', gecici);
+  try {
+    execSync(`git fetch -q --depth 1 ${uzak} gh-pages`, { cwd: gecici, stdio: 'ignore' });
+    sh('git reset -q --soft FETCH_HEAD', gecici);
+  } catch {
+    console.log('Önceki yayın yok; ilk yayın tam gönderilecek.');
+  }
   sh('git add -A', gecici);
   const not = process.env.YAYIN_NOTU ? `\n\n${process.env.YAYIN_NOTU}` : '';
   writeFileSync(join(gecici, '.git', 'YAYIN_MSG'), `Yayın ${new Date().toISOString().slice(0, 16).replace('T', ' ')}${not}\n`);

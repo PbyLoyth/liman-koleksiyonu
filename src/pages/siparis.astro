@@ -12,50 +12,77 @@ const satici = [
   ['E-posta', s.eposta],
   ['Telefon', s.telefon],
 ].filter(([, v]) => v);
+const bolumler = [
+  ['siparis', 'Sipariş'],
+  ['iade', 'İade'],
+  ['hasar', 'Kargoda hasar'],
+  ['beton', 'Beton hakkında'],
+  ['gizlilik', 'Gizlilik'],
+];
 ---
 <Base baslik="Sipariş ve iade — Savana Season" aciklama="Sipariş nasıl verilir, teslim, iade ve gizlilik.">
-  <article class="kap metin-sayfa">
-    <h1>Sipariş ve iade</h1>
-    <p class="metin-giris">Kısa ve açık: nasıl sipariş verilir, ne zaman gelir, nasıl iade edilir.</p>
-
-    <section>
-      <h2>Sipariş</h2>
-      <p>Ürün sayfasında parçayı ve yüzeyini seç, <b>Sipariş ver</b>’e bas. Pencere sipariş mesajını hazırlar; mesajı gönderdiğinde siparişin bize ulaşır.</p>
-      <p>Her parça siparişle elde dökülür ve beton kürünü tamamlamak için birkaç gün bekler. Teslim süresini ve kargo ücretini mesajda netleştiririz.</p>
-      {site.odeme ? <p>Ödeme: {site.odeme}.</p> : <p>Ödeme seçeneklerini sipariş mesajında paylaşırız.</p>}
-    </section>
-
-    <section>
-      <h2>İade</h2>
-      <p>Teslimden sonraki 14 gün içinde gerekçe göstermeden cayma hakkını kullanabilirsin. Bize mesajla bildirmen yeterli.</p>
-      <p>İade kargo ücreti bize aittir. Ürünü kullanılmamış ve paketiyle geri gönder; bedel, bildiriminin bize ulaştığı günden itibaren 14 gün içinde iade edilir.</p>
-    </section>
-
-    <section>
-      <h2>Kargoda hasar</h2>
-      <p>Paket hasarlı gelirse teslim aldığın gün fotoğrafını gönder. Yenisini döküp göndeririz ya da bedelini iade ederiz.</p>
-    </section>
-
-    <section>
-      <h2>Beton hakkında</h2>
-      <p>Her parça elde döküldüğü için ton, küçük gözenekler ve sıçrama yerleri parçadan parçaya değişir. İki parça birebir aynı olmaz.</p>
-      <p>Kuru ya da hafif nemli bezle silmen yeterli. Keson, Rıhtım ve Gül’ün altında keçe var; diğer parçaları hassas yüzeylerde altına keçe koyarak kullan.</p>
-    </section>
-
-    <section>
-      <h2>Gizlilik</h2>
-      <p>Bu site çerez kullanmaz ve kişisel veri toplamaz. Sipariş mesajında paylaştığın bilgileri yalnız siparişini hazırlamak ve göndermek için kullanırız.</p>
-    </section>
-
-    {satici.length > 0 && (
-      <section>
-        <h2>Satıcı bilgileri</h2>
-        <dl class="oz-liste">
-          {satici.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
-        </dl>
-      </section>
-    )}
-
-    <p class="geri"><a href={`${yol('')}#koleksiyonlar`}>Koleksiyonlara dön <span aria-hidden="true">›</span></a></p>
+  <article class="metin-sayfa koyu" data-ton="koyu">
+    <div class="kap ms-bas">
+      <p class="bolum-no">Bilgi</p>
+      <h1 class="baslik">Sipariş ve iade</h1>
+      <p class="soluk ms-giris">Kısa ve açık: nasıl sipariş verilir, ne zaman gelir, nasıl iade edilir.</p>
+    </div>
+    <div class="kap ms-duzen">
+      <nav class="ms-icindekiler mono" aria-label="Bu sayfada">
+        {bolumler.map(([id, ad], i) => <a href={`#${id}`}><span class="soluk">0{i + 1}</span> {ad}</a>)}
+      </nav>
+      <div class="ms-govde">
+        <section id="siparis">
+          <h2 class="ust">Sipariş</h2>
+          <p>Ürün sayfasında parçayı ve yüzeyini seç, <b>Sipariş ver</b>’e bas. Pencere sipariş mesajını hazırlar; mesajı gönderdiğinde siparişin bize ulaşır.</p>
+          <p>Her parça siparişle elde dökülür ve beton kürünü tamamlamak için birkaç gün bekler. Teslim süresini ve kargo ücretini mesajda netleştiririz.</p>
+          {site.odeme ? <p>Ödeme: {site.odeme}.</p> : <p>Ödeme seçeneklerini sipariş mesajında paylaşırız.</p>}
+        </section>
+        <section id="iade">
+          <h2 class="ust">İade</h2>
+          <p>Teslimden sonraki 14 gün içinde gerekçe göstermeden cayma hakkını kullanabilirsin. Bize mesajla bildirmen yeterli.</p>
+          <p>İade kargo ücreti bize aittir. Ürünü kullanılmamış ve paketiyle geri gönder; bedel, bildiriminin bize ulaştığı günden itibaren 14 gün içinde iade edilir.</p>
+        </section>
+        <section id="hasar">
+          <h2 class="ust">Kargoda hasar</h2>
+          <p>Paket hasarlı gelirse teslim aldığın gün fotoğrafını gönder. Yenisini döküp göndeririz ya da bedelini iade ederiz.</p>
+        </section>
+        <section id="beton">
+          <h2 class="ust">Beton hakkında</h2>
+          <p>Her parça elde döküldüğü için ton, küçük gözenekler ve sıçrama yerleri parçadan parçaya değişir. İki parça birebir aynı olmaz.</p>
+          <p>Kuru ya da hafif nemli bezle silmen yeterli. Keson, Rıhtım ve Gül’ün altında keçe var; diğer parçaları hassas yüzeylerde altına keçe koyarak kullan.</p>
+        </section>
+        <section id="gizlilik">
+          <h2 class="ust">Gizlilik</h2>
+          <p>Bu site çerez kullanmaz ve kişisel veri toplamaz. Sipariş mesajında paylaştığın bilgileri yalnız siparişini hazırlamak ve göndermek için kullanırız.</p>
+        </section>
+        {satici.length > 0 && (
+          <section id="satici">
+            <h2 class="ust">Satıcı bilgileri</h2>
+            <dl class="ms-oz">
+              {satici.map(([k, v]) => <div><dt class="mono soluk">{k}</dt><dd>{v}</dd></div>)}
+            </dl>
+          </section>
+        )}
+        <p class="ms-geri"><a class="ok-bag" href={`${yol('')}#koleksiyon`}>Koleksiyona dön <span aria-hidden="true">→</span></a></p>
+      </div>
+    </div>
   </article>
 </Base>
+
+<style>
+  .metin-sayfa { padding-top: var(--ub-y); padding-bottom: clamp(64px, 9vw, 130px); }
+  .ms-bas { padding-block: clamp(48px, 8vw, 110px) clamp(28px, 4vw, 48px); border-bottom: 1px solid var(--c); }
+  .ms-bas h1 { font-size: clamp(44px, 6.5vw, 96px); margin-block: 14px 18px; }
+  .ms-giris { max-width: 48ch; font-size: 16px; }
+  .ms-duzen { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(28px, 6vw, 100px); padding-top: 40px; }
+  .ms-icindekiler { position: sticky; top: calc(var(--ub-y) + 32px); align-self: start; display: grid; gap: 10px; }
+  .ms-icindekiler a { opacity: .8; } .ms-icindekiler a:hover { opacity: 1; }
+  .ms-govde { display: grid; gap: 40px; max-width: 64ch; font-size: 16px; }
+  .ms-govde section { display: grid; gap: 12px; padding-top: 24px; border-top: 1px solid var(--c); }
+  .ms-oz div { display: grid; grid-template-columns: 12em 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--c); }
+  @media (max-width: 860px) {
+    .ms-duzen { grid-template-columns: 1fr; }
+    .ms-icindekiler { position: static; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  }
+</style>

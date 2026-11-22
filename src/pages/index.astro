@@ -1,213 +1,594 @@
 ---
-import { Image, getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
+import { existsSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
 import UrunKart from '../components/UrunKart.astro';
 import Ornek from '../components/Ornek.astro';
+import Kayan from '../components/Kayan.astro';
+import Isaret from '../components/Isaret.astro';
 import { urunler, koleksiyonlar } from '../data/urunler.js';
-import { yuzeyler } from '../data/yuzeyler.js';
-import { koleksiyonGorseli, urunGorseli, kullanimGorseli } from '../data/gorseller.js';
+import { yuzeyler, yuzeyBul, yuzeyAdi } from '../data/yuzeyler.js';
+import {
+  donusKok, kapakKok, ilkKare, masadaGorsel, sahneler, cekildi, foto, fotoVar, kapakFoto, cekimAdi, KARE, KAPAK_KARE,
+} from '../data/gorseller.js';
 import { yol, urunYolu } from '../data/yol.js';
 
-// Kapak: telefonda 5:4, genişte 2:1 (Katedral serimi, Grafit, kara mermer)
-const darKapak = await getImage({ src: koleksiyonGorseli('kapak'), widths: [640, 960, 1280], format: 'webp', quality: 74 });
-const genisKapak = await getImage({ src: koleksiyonGorseli('kapak-genis'), widths: [1280, 1920, 2560], format: 'webp', quality: 74 });
-const hikayeGorseli = kullanimGorseli('sapel') ?? urunGorseli('keson', 'tuz', 'aci');
+// Kapak dönüşü 48 kare (kapak/<ürün>); yoksa ürünün 24 karelik Tuz dönüşü
+const KAPAK = 'kemer';
+const kapakVar = existsSync(`public/donus/kapak/${KAPAK}/b/00.webp`);
+const kapakYolu = kapakVar ? kapakKok(KAPAK) : donusKok(KAPAK, 'tuz');
+const kapak = ilkKare(kapakYolu);
+const DIZI = 'sapel';
+const masada = Object.keys(sahneler)
+  .map((slug) => ({ u: urunler.find((x) => x.slug === slug), ...sahneler[slug], img: masadaGorsel(slug) }))
+  .filter((m) => m.u && m.img);
+const sayi = urunler.filter((u) => !u.yakinda).length;
+// Anahtar: bütün parçaları çekilmiş yüzeyler; dizi: Şapel'in çekilmiş yüzeyleri
+const anahtar = yuzeyler.filter((y) => urunler.every((u) => cekildi(u.slug, y.id)));
+// Izgara açılışta her ürünü kendi renginde gösterir (bütün renkler çekildiyse)
+const varsayilan = anahtar.some((y) => y.id === 'renk') ? 'renk' : 'tuz';
+const dizi = yuzeyler.filter((y) => cekildi(DIZI, y.id));
+const kapaklar = { katedral: kapakFoto('katedral'), liman: kapakFoto('liman') };
+
+// Her açıdan: her ürün kendi renginde bir kare, yanında başka yüzeylerden açı ve üst çekimleri
+const DUVAR = [
+  ['payanda', 'renk', 'aci'], ['sapel', 'lansman', 'aci'], ['gul', 'renk', 'ust'], ['kemer', 'grafit', 'aci'],
+  ['keson', 'renk', 'ust'], ['dalgakiran', 'su-hatti', 'aci'], ['rihtim', 'renk', 'aci'], ['demet', 'tuz', 'ust'],
+  ['antifer', 'renk', 'ust'], ['baba', 'serpinti', 'aci'], ['fener', 'renk', 'aci'], ['silo', 'grafit', 'ust'],
+  ['sapel', 'renk', 'ust'], ['payanda', 'lansman', 'ust'], ['kemer', 'renk', 'aci'], ['silo', 'renk', 'aci'],
+  ['baba', 'renk', 'ust'], ['demet', 'renk', 'aci'], ['gul', 'isaret', 'aci'], ['keson', 'tuz-biber', 'aci'],
+];
+const duvar = DUVAR.filter(([s, y, c]) => fotoVar(s, y, c))
+  .map(([s, y, c]) => ({ u: urunler.find((x) => x.slug === s), y: yuzeyBul(y), c, f: foto(s, y, c) }))
+  .slice(0, 16);
 ---
-<Base>
-  <section class="kapak">
-    <div class="kap kapak-metin">
-      <p class="ust-baslik">beton objeler</p>
-      <h1 class="fraktur">Savana Season</h1>
-      <p class="kapak-alt">Elde dökülen beton objeler. İki koleksiyon: Katedral ve Liman.</p>
-      <div class="eylem">
-        <a class="dugme" href="#koleksiyonlar">Koleksiyonlar</a>
-        <a class="bag" href="#hikaye">Hikâye <span aria-hidden="true">›</span></a>
-      </div>
+<Base ana>
+  <section class="kapak koyu" data-ton="koyu" aria-labelledby="kapak-bas">
+    <h1 id="kapak-bas" class="kapak-baslik marka">
+      <span class="satir"><span class="krom canli">Savana</span></span>
+      <span class="satir"><span class="krom canli">Season</span></span>
+    </h1>
+    <div class="kapak-isik" aria-hidden="true"></div>
+    <div
+      class="donus kapak-urun"
+      data-donus
+      data-mod="oto"
+      data-boy="b"
+      data-kok={kapakYolu}
+      data-kare={kapakVar ? KAPAK_KARE : KARE}
+      role="img"
+      aria-label="Kemer kitap desteği, Tuz yüzey, kendi ekseninde dönüyor"
+    >
+      <img
+        src={kapak.src}
+        srcset={kapak.srcset}
+        sizes="(min-width: 900px) 54svh, 86vw"
+        width="1000"
+        height="1250"
+        alt=""
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
     </div>
-    <div class="kap kap-genis">
-      <picture>
-        <source media="(min-width: 700px)" srcset={genisKapak.srcSet.attribute} sizes="(min-width: 1440px) 1360px, 100vw" />
-        <img
-          class="kapak-gorsel kapak-iki"
-          src={darKapak.src}
-          srcset={darKapak.srcSet.attribute}
-          sizes="100vw"
-          width="1600"
-          height="1280"
-          alt="Katedral koleksiyonu Grafit yüzeyle kara mermer üzerinde: kemer çifti, şarap tutucu, mum feneri, vazo ve takı tabağı"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
-      </picture>
-    </div>
+    <p class="kose kose-su mono">Beton objeler<br />Elde dökülür</p>
+    <p class="kose kose-sa mono">Katedral · Liman<br />{sayi} parça · {yuzeyler.length} yüzey</p>
+    <a class="kose kose-alt-sol mono" href="#koleksiyon">Koleksiyon <span aria-hidden="true">↓</span></a>
+    <p class="kose kose-alt-sag mono">Sürükle, döndür<br />Siparişle dökülür</p>
   </section>
 
-  <div id="koleksiyonlar">
-    {koleksiyonlar.map((k) => {
-      const satista = urunler.filter((u) => u.koleksiyon === k.id && !u.yakinda);
-      const yakinda = urunler.filter((u) => u.koleksiyon === k.id && u.yakinda);
+  <Kayan />
+
+  <section id="koleksiyon" class="dukkan koyu" data-ton="koyu" data-dukkan data-taban={yol('')}>
+    <div class="kap bas belir">
+      <div>
+        <p class="bolum-no">01 — Koleksiyon</p>
+        <h2 class="baslik">Koleksiyon. <span class="soluk">On iki parça, her biri kendi renginde.</span></h2>
+      </div>
+      <div class="anahtar" role="group" aria-label="Bütün parçaları şu yüzeyde göster">
+        <p class="ust">Yüzey <span class="anahtar-ad" aria-live="polite" data-anahtar-ad>{varsayilan === 'renk' ? 'Kendi rengi' : 'Tuz'}</span></p>
+        <div class="anahtar-liste">
+          {anahtar.map((y, i) => (
+            <button
+              type="button"
+              class="anahtar-dugme"
+              data-yz={y.id}
+              data-ad={y.id === 'renk' ? 'Kendi rengi' : y.ad}
+              aria-pressed={y.id === varsayilan ? 'true' : 'false'}
+              aria-label={`${y.ad}: ${y.kisa}`}
+              title={y.lansman ? `${y.ad} · lansman` : y.ad}
+            >
+              <Ornek yuzey={y.id} />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {koleksiyonlar.map((k, n) => {
+      const liste = urunler.filter((u) => u.koleksiyon === k.id);
+      const kf = kapaklar[k.id];
       return (
-        <section id={k.id} class="bolum">
-          <div class="kap">
-            <div class="bolum-bas">
-              <p class="ust-baslik">Koleksiyon</p>
-              <h2>{k.ad}</h2>
+        <div class="kol" id={k.id}>
+          <figure class="kol-kapak foto">
+            <img src={kf.src} srcset={kf.srcset} sizes="100vw" width="2400" height="1200" alt={`${k.ad} koleksiyonu, serim`} loading="lazy" decoding="async" />
+            <figcaption class="kap kol-yazi">
+              <span class="mono">0{n + 1} · {liste.length} parça</span>
+              <h3 class="baslik">{k.ad}</h3>
               <p>{k.alt}</p>
-            </div>
-            <div class="izgara">
-              {satista.map((u) => <UrunKart u={u} />)}
-            </div>
-            {yakinda.map((u) => (
-              <a class="yakinda" href={urunYolu(u.slug)}>
-                <div class="yakinda-metin">
-                  <span class="rozet">Yakında</span>
-                  <h3>{u.ad}</h3>
-                  <p class="yakinda-rol">{u.rol}</p>
-                  <p>{u.metin}</p>
-                  <span class="bag">İncele <span aria-hidden="true">›</span></span>
-                </div>
-                <Image
-                  class="yakinda-gorsel"
-                  src={kullanimGorseli(u.slug) ?? urunGorseli(u.slug, 'renk', 'aci')}
-                  quality={74}
-                  widths={[480, 720, 960]}
-                  sizes="(min-width: 900px) 36vw, 100vw"
-                  alt={`${u.ad} masa lambası, gece yanarken`}
-                  loading="lazy"
-                />
-              </a>
-            ))}
-          </div>
-        </section>
+            </figcaption>
+          </figure>
+          <ul class="izgara">
+            {liste.map((u) => <UrunKart u={u} yuzey={varsayilan} />)}
+          </ul>
+        </div>
       );
     })}
-  </div>
+  </section>
 
-  <section id="yuzeyler" class="bolum yuzey-bolum">
-    <div class="kap">
-      <div class="bolum-bas">
-        <p class="ust-baslik">Her parça için</p>
-        <h2>Yedi yüzey</h2>
-        <p>Kalıp aynı, yüzey değişir. Sıçramalar elde atılır; her parçada başka yere düşer.</p>
+  <section id="galeri" class="galeri koyu" data-ton="koyu" aria-labelledby="galeri-bas">
+    <div class="kap bas belir">
+      <div>
+        <p class="bolum-no">02 — Fotoğraflar</p>
+        <h2 id="galeri-bas" class="baslik">Her açıdan. <span class="soluk">Yandan, üstten; renkli ve yalın.</span></h2>
       </div>
-      <div class="yz-sahne" data-yz-sahne>
-        {yuzeyler.map((y, i) => (
-          <Image
-            class:list={['yz-gorsel', i === 0 && 'etkin']}
-            src={koleksiyonGorseli(y.id)}
-            quality={74}
-            widths={[960, 1440, 2000]}
-            sizes="(min-width: 1240px) 1180px, 100vw"
-            alt={`Liman koleksiyonu, ${y.ad} yüzeyle`}
-            loading="lazy"
-            hidden={i !== 0}
-            data-yz={y.id}
-          />
-        ))}
+      <p class="bas-yan">Her parça kendi rengiyle ve öbür yüzeylerle, beton, traverten ve mermer üstünde.</p>
+    </div>
+    <ul class="kap duvar">
+      {duvar.map((d) => (
+        <li>
+          <a class="duvar-kare foto" href={urunYolu(d.u.slug, cekildi(d.u.slug, d.y.id) ? d.y.id : 'tuz')}>
+            <img
+              src={d.f.src}
+              srcset={d.f.srcset}
+              sizes="(min-width: 1100px) 24vw, (min-width: 700px) 32vw, 50vw"
+              width="1200"
+              height="1500"
+              alt={`${d.u.ad}, ${yuzeyAdi(d.y, d.u)} yüzey, ${cekimAdi[d.c].toLocaleLowerCase('tr-TR')}`}
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="duvar-yazi">
+              <strong>{d.u.ad}</strong>
+              <span class="mono">{yuzeyAdi(d.y, d.u)} · {cekimAdi[d.c]}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section id="masada" class="masada koyu" data-ton="koyu" aria-labelledby="masada-bas">
+    <div class="kap bas belir">
+      <div>
+        <p class="bolum-no">03 — Kullanım</p>
+        <h2 id="masada-bas" class="baslik">Masada. <span class="soluk">Her parçanın bir işi var.</span></h2>
       </div>
-      <div class="yz-secim" role="tablist" aria-label="Yüzey">
-        {yuzeyler.map((y, i) => (
-          <button
-            type="button"
-            role="tab"
-            class="yz-dugme"
-            aria-selected={i === 0 ? 'true' : 'false'}
-            tabindex={i === 0 ? 0 : -1}
-            data-yz={y.id}
-            data-metin={y.metin}
-          >
-            <Ornek yuzey={y.id} />
-            <span>{y.ad}</span>
-          </button>
-        ))}
+      <div class="masada-yan">
+        <p class="bas-yan">Şarabı tutar, mumu saklar, kitabı yaslar.</p>
+        <div class="masada-ok">
+          <button type="button" class="ok" data-yon="-1" aria-label="Önceki sahne">←</button>
+          <button type="button" class="ok" data-yon="1" aria-label="Sonraki sahne">→</button>
+        </div>
       </div>
-      <p class="yz-metin" aria-live="polite" data-yz-metin>{yuzeyler[0].metin}</p>
+    </div>
+    <div class="masada-serit" data-serit tabindex="0" aria-label="Kullanım sahneleri">
+      {masada.map((m, i) => (
+        <a class="masada-kare" href={urunYolu(m.u.slug, cekildi(m.u.slug, m.yuzey) ? m.yuzey : 'tuz')} draggable="false">
+          <div class="masada-gorsel">
+            <Image
+              src={m.img}
+              widths={[420, 640, 900, 1200]}
+              sizes="(min-width: 1200px) 30vw, (min-width: 760px) 42vw, 78vw"
+              quality={76}
+              alt={`${m.u.ad} ${m.u.rol.toLocaleLowerCase('tr-TR')} olarak kullanımda: ${m.sahne.toLocaleLowerCase('tr-TR')}`}
+              loading="lazy"
+              draggable="false"
+            />
+          </div>
+          <div class="masada-yazi">
+            <span class="mono soluk">№ {String(i + 1).padStart(2, '0')}</span>
+            <strong>{m.u.ad}</strong>
+            <span class="soluk">{m.u.rol} · {m.sahne} · {yuzeyAdi(yuzeyBul(m.yuzey), m.u)}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+    <div class="kap masada-alt">
+      <div class="ilerleme" aria-hidden="true"><span data-ilerleme></span></div>
     </div>
   </section>
 
-  <section id="hikaye" class="bolum hikaye">
+  <section id="yuzeyler" class="yuzeyler koyu" data-ton="koyu" aria-labelledby="yz-bas">
+    <div class="kap bas belir">
+      <div>
+        <p class="bolum-no">04 — Yüzeyler</p>
+        <h2 id="yz-bas" class="baslik">{yuzeyler.length} yüzey. <span class="soluk">Kalıp aynı, yüzey değişir.</span></h2>
+      </div>
+      <p class="bas-yan">Her parçanın kendine özgü bir rengi var, lansmana özel Krom bütün parçalarda. Sıçramalar elde atılır; her parçada başka yere düşer.</p>
+    </div>
+    <ol class="dizi" data-dizi>
+      {dizi.map((y, i) => {
+        const kok = donusKok(DIZI, y.id);
+        const ilk = ilkKare(kok);
+        return (
+          <li class="dizi-oge">
+            <div class="donus havuz" data-donus data-mod="dis" data-kok={kok} data-kare={KARE}>
+              <img src={ilk.src} srcset={ilk.srcset} sizes="(min-width: 1000px) 13vw, 44vw" width="1000" height="1250" alt={`Şapel, ${y.ad} yüzey`} loading="lazy" decoding="async" />
+            </div>
+            <div class="dizi-yazi">
+              <span class="mono soluk">{String(i + 1).padStart(2, '0')}{y.lansman ? ' · Lansman' : ''}</span>
+              <h3 class="dizi-ad">{y.id === 'renk' ? 'Kendi rengi' : y.ad}</h3>
+              <p class="soluk">{y.kisa}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+    <p class="kap mono soluk dizi-ipucu">Fareyi dizinin üstünde gezdir: hepsi birlikte döner.</p>
+  </section>
+
+  <section id="hikaye" class="hikaye koyu" data-ton="koyu" aria-labelledby="hikaye-bas">
     <div class="kap hikaye-ic">
+      <p class="bolum-no">05 — Hikâye</p>
+      <h2 id="hikaye-bas" class="baslik hikaye-baslik">Taş, iş ve ışık.</h2>
       <div class="hikaye-metin">
-        <p class="ust-baslik">Hikâye</p>
-        <h2>Taş, iş ve ışık.</h2>
         <p>Limanda her yapının bir işi var: dalgakıran dalgayı kırar, baba halatı tutar. Katedralde taş ışığa yol açar: kemer yükü taşır, payanda duvarı tutar, gül pencere ışığı süzer.</p>
         <p>Savana Season bu yapıları masaya küçültüp onlara yeni bir iş veriyor. Payanda şarabı tutuyor, şapel mumu, kemer kitabı.</p>
         <p>Her parça beyaz çimentoyla elde dökülür. Yüzeydeki çizgiler kalıpta oluşur ve harçla tek tek doldurulur.</p>
       </div>
-      <Image
-        class="hikaye-gorsel kemer-maske"
-        src={hikayeGorseli}
-        quality={74}
-        widths={[480, 720, 960, 1280]}
-        sizes="(min-width: 900px) 44vw, 100vw"
-        alt="Şapel mum feneri gece yanarken: ışık sivri pencerelerden süzülüyor"
-        loading="lazy"
-      />
+      {masadaGorsel('sapel') && (
+        <figure class="hikaye-gorsel">
+          <Image
+            src={masadaGorsel('sapel')}
+            widths={[480, 720, 960, 1280]}
+            sizes="(min-width: 900px) 38vw, 100vw"
+            quality={76}
+            alt="Şapel mum feneri gece yanarken: ışık sivri pencerelerden süzülüyor"
+            loading="lazy"
+          />
+          <figcaption class="mono soluk">Şapel · Arduvaz, gece</figcaption>
+        </figure>
+      )}
+      <ul class="olgular mono">
+        <li><Isaret />Beyaz çimento</li>
+        <li><Isaret />Elde döküm</li>
+        <li><Isaret />Harçla doldurulan derz</li>
+        <li><Isaret />Siparişle üretim</li>
+      </ul>
     </div>
   </section>
 
-  <section id="nasil" class="bolum">
-    <div class="kap">
-      <div class="bolum-bas">
-        <p class="ust-baslik">Sipariş</p>
-        <h2>Üç adımda</h2>
+  <section id="siparis" class="adimlar koyu" data-ton="koyu" aria-labelledby="adim-bas">
+    <div class="kap bas belir">
+      <div>
+        <p class="bolum-no">06 — Sipariş</p>
+        <h2 id="adim-bas" class="baslik">Üç adım. <span class="soluk">Seç, yaz, gelsin.</span></h2>
       </div>
-      <ol class="adimlar">
-        <li><span class="adim-no">1</span><h3>Seç</h3><p>Parçayı ve yüzeyini seç.</p></li>
-        <li><span class="adim-no">2</span><h3>Yaz</h3><p>Sipariş düğmesi mesajını hazırlar, sen gönderirsin.</p></li>
-        <li><span class="adim-no">3</span><h3>Dökülür, gelir</h3><p>Parçan elde dökülür, kürünü alır ve kargoya verilir.</p></li>
-      </ol>
-      <p class="iade-not">
-        Teslimden sonra 14 gün içinde iade edebilirsin; iade kargosu bizden.
-        <a href={yol('siparis/')}>Sipariş ve iade <span aria-hidden="true">›</span></a>
-      </p>
+    </div>
+    <ol class="kap adim-liste belir">
+      <li><span class="adim-no mono">01</span><h3 class="adim-ad">Seç</h3><p class="soluk">Parçayı ve yüzeyini seç: kendi rengi, lansmana özel Krom ya da öbür yüzeyler.</p></li>
+      <li><span class="adim-no mono">02</span><h3 class="adim-ad">Yaz</h3><p class="soluk">Sipariş düğmesi mesajını hazırlar, sen gönderirsin.</p></li>
+      <li><span class="adim-no mono">03</span><h3 class="adim-ad">Dökülür, gelir</h3><p class="soluk">Parçan elde dökülür, kürünü alır ve kargoya verilir.</p></li>
+    </ol>
+    <div class="kap iade">
+      <p class="soluk">Teslimden sonra 14 gün içinde iade edebilirsin; iade kargosu bizden.</p>
+      <a class="ok-bag" href={yol('siparis/')}>Sipariş ve iade <span aria-hidden="true">→</span></a>
     </div>
   </section>
 </Base>
 
 <script>
-  // Yedi yüzey: sekme seçimi koleksiyon görselini yumuşak geçişle değiştirir
-  const sahne = document.querySelector<HTMLElement>('[data-yz-sahne]');
-  const metin = document.querySelector<HTMLElement>('[data-yz-metin]');
-  const dugmeler = [...document.querySelectorAll<HTMLButtonElement>('.yz-dugme')];
-  let istenen = 0;
-  const gorsel = (id: string) => sahne?.querySelector<HTMLImageElement>(`img[data-yz="${id}"]`);
+  import { donuslerKur, donusBul } from '../scripts/donus';
 
-  async function sec(i: number) {
-    istenen = i;
-    const d = dugmeler[i];
-    dugmeler.forEach((b, j) => {
-      b.setAttribute('aria-selected', String(j === i));
-      b.tabIndex = j === i ? 0 : -1;
+  donuslerKur();
+
+  // Koleksiyon anahtarı: bütün kartları seçilen yüzeye çevirir
+  const dukkan = document.querySelector<HTMLElement>('[data-dukkan]')!;
+  const taban = dukkan.dataset.taban!;
+  const adEl = dukkan.querySelector<HTMLElement>('[data-anahtar-ad]')!;
+  const dugmeler = [...dukkan.querySelectorAll<HTMLButtonElement>('.anahtar-dugme')];
+  dugmeler.forEach((d) =>
+    d.addEventListener('click', () => {
+      const yz = d.dataset.yz!;
+      dugmeler.forEach((b) => b.setAttribute('aria-pressed', String(b === d)));
+      adEl.textContent = d.dataset.ad!;
+      dukkan.querySelectorAll<HTMLAnchorElement>('[data-kart]').forEach((a, i) => {
+        const slug = a.dataset.slug!;
+        a.href = `${taban}urun/${slug}/${yz === 'tuz' ? '' : `${yz}/`}`;
+        const don = donusBul(a.querySelector('[data-donus]'));
+        setTimeout(() => don?.kokDegistir(`${taban}donus/${slug}/${yz}/`), i * 35);
+      });
+    }),
+  );
+
+  // Yüzeyler dizisi: dönüşler birlikte; görünür olunca bir tur, fareyle gezdikçe döner
+  const dizi = document.querySelector<HTMLElement>('[data-dizi]')!;
+  const dizidekiler = [...dizi.querySelectorAll('[data-donus]')].map((e) => donusBul(e)!).filter(Boolean);
+  const hepsiYuklensin = () => dizidekiler.forEach((d) => d.yukle());
+  let turAtildi = false;
+  new IntersectionObserver(
+    ([g], gozcu) => {
+      if (!g.isIntersecting) return;
+      gozcu.disconnect();
+      hepsiYuklensin();
+      const bas = performance.now();
+      const bekle = () => {
+        const hazir = dizidekiler.every((d) => d.el.classList.contains('hazir'));
+        if (hazir && !turAtildi && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          turAtildi = true;
+          dizidekiler.forEach((d, i) => setTimeout(() => d.tween(d.i + d.kare, 2400), i * 70));
+        } else if (!hazir && performance.now() - bas < 8000) setTimeout(bekle, 200);
+      };
+      bekle();
+    },
+    { threshold: 0.3 },
+  ).observe(dizi);
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    dizi.addEventListener('pointerenter', hepsiYuklensin);
+    dizi.addEventListener('pointermove', (e) => {
+      const r = dizi.getBoundingClientRect();
+      const oran = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      dizidekiler.forEach((d) => {
+        d.tw = null;
+        d.i = (oran - 0.5) * (d.kare - 1);
+        d.ciz();
+      });
     });
-    if (metin) metin.textContent = d.dataset.metin ?? '';
-    const yeni = gorsel(d.dataset.yz ?? '');
-    const eski = sahne?.querySelector<HTMLImageElement>('img.etkin');
-    if (!yeni || yeni === eski) return;
-    yeni.hidden = false;
-    try { await yeni.decode(); } catch {}
-    if (istenen !== i) return;
-    sahne?.querySelectorAll('img.etkin').forEach((e) => e.classList.remove('etkin'));
-    yeni.classList.add('etkin');
-    setTimeout(() => {
-      sahne?.querySelectorAll<HTMLImageElement>('img.yz-gorsel:not(.etkin)').forEach((e) => (e.hidden = true));
-    }, 520);
+    dizi.addEventListener('pointerleave', () =>
+      dizidekiler.forEach((d) => d.tween(Math.round(d.i / d.kare) * d.kare, 600)),
+    );
   }
 
-  dugmeler.forEach((d, i) => {
-    d.addEventListener('click', () => sec(i));
-    d.addEventListener('pointerenter', () => {
-      const im = gorsel(d.dataset.yz ?? '');
-      if (im) im.loading = 'eager';
-    });
-    d.addEventListener('keydown', (e) => {
-      const yon = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-      if (!yon) return;
-      e.preventDefault();
-      const j = (i + yon + dugmeler.length) % dugmeler.length;
-      dugmeler[j].focus();
-      sec(j);
-    });
+  // Masada şeridi: fareyle sürükle, oklarla geç, ilerleme çizgisi
+  const serit = document.querySelector<HTMLElement>('[data-serit]')!;
+  const ilerleme = document.querySelector<HTMLElement>('[data-ilerleme]')!;
+  const guncelle = () => {
+    const azami = serit.scrollWidth - serit.clientWidth;
+    const oran = azami > 0 ? serit.scrollLeft / azami : 0;
+    const gorunen = serit.clientWidth / serit.scrollWidth;
+    ilerleme.style.width = `${Math.max(8, gorunen * 100)}%`;
+    ilerleme.style.transform = `translateX(${oran * (1 / Math.max(gorunen, 0.08) - 1) * 100}%)`;
+  };
+  serit.addEventListener('scroll', guncelle, { passive: true });
+  addEventListener('resize', guncelle);
+  guncelle();
+  const adim = () => (serit.querySelector<HTMLElement>('.masada-kare')?.offsetWidth ?? 300) + 16;
+  document.querySelectorAll<HTMLButtonElement>('.masada-ok .ok').forEach((b) =>
+    b.addEventListener('click', () => serit.scrollBy({ left: Number(b.dataset.yon) * adim(), behavior: 'smooth' })),
+  );
+  let surukle: { x: number; sol: number; oynadi: boolean } | null = null;
+  serit.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    surukle = { x: e.clientX, sol: serit.scrollLeft, oynadi: false };
+    serit.classList.add('cekiliyor');
+  });
+  addEventListener('pointermove', (e) => {
+    if (!surukle) return;
+    const dx = e.clientX - surukle.x;
+    if (Math.abs(dx) > 5) surukle.oynadi = true;
+    serit.scrollLeft = surukle.sol - dx;
+  });
+  addEventListener('pointerup', () => {
+    if (!surukle) return;
+    const oynadi = surukle.oynadi;
+    surukle = null;
+    serit.classList.remove('cekiliyor');
+    if (oynadi) {
+      const engelle = (ev: Event) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+      };
+      serit.addEventListener('click', engelle, { capture: true, once: true });
+      setTimeout(() => serit.removeEventListener('click', engelle, { capture: true }), 60);
+    }
   });
 </script>
+
+<style>
+  /* ---------------------------------------------------------------- kapak */
+  .kapak {
+    position: relative; height: 100svh; min-height: 600px; max-height: 1180px;
+    display: grid; place-items: center; overflow: hidden; isolation: isolate;
+  }
+  .kapak-baslik {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; flex-direction: column; justify-content: center; gap: .06em;
+    padding-inline: var(--kenar);
+    font-size: clamp(96px, 19.2vw, 372px); line-height: .8;
+    pointer-events: none;
+  }
+  .satir { display: block; }
+  .satir > span { display: block; padding-block: .04em; }
+  .satir:first-child { align-self: flex-start; }
+  .satir:last-child { align-self: flex-end; }
+  .kapak-isik {
+    position: absolute; z-index: 0; left: 50%; top: 64%;
+    width: min(80vw, 1000px); aspect-ratio: 2.6 / 1; transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgb(255 255 255 / .11), rgb(255 255 255 / .03) 60%, transparent);
+  }
+  .kapak-urun { position: relative; z-index: 2; width: min(86vw, 54svh); margin-top: calc(var(--ub-y) * .4); }
+  .kose { position: absolute; z-index: 3; color: var(--soluk); }
+  .kose-su { top: calc(var(--ub-y) + 18px); left: var(--kenar); }
+  .kose-sa { top: calc(var(--ub-y) + 18px); right: var(--kenar); text-align: right; }
+  .kose-alt-sol { bottom: 22px; left: var(--kenar); color: var(--yazi); }
+  .kose-alt-sag { bottom: 22px; right: var(--kenar); text-align: right; }
+  /* kaydırınca kelimeler iki yana açılır, ürün geri çekilir (destekleyen tarayıcılarda) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .kapak { view-timeline-name: --kapak; }
+      .satir, .kapak-urun {
+        animation-timing-function: linear; animation-fill-mode: both;
+        animation-timeline: --kapak; animation-range: exit 0% exit 100%;
+      }
+      .satir:first-child { animation-name: ayril-sol; }
+      .satir:last-child { animation-name: ayril-sag; }
+      .kapak-urun { animation-name: geri-cekil; }
+      @keyframes ayril-sol { to { transform: translateX(-14%); opacity: .25; } }
+      @keyframes ayril-sag { to { transform: translateX(14%); opacity: .25; } }
+      @keyframes geri-cekil { to { transform: scale(.86) translateY(8%); opacity: .4; } }
+    }
+  }
+  @media (max-width: 760px) {
+    .kapak { min-height: 560px; }
+    .kapak-baslik { justify-content: space-between; padding-block: calc(var(--ub-y) + 64px) 70px; font-size: clamp(84px, 25vw, 160px); }
+    .kose-alt-sag { display: none; }
+  }
+
+  /* ---------------------------------------------------------------- koleksiyon */
+  .anahtar { display: grid; justify-items: end; gap: 10px; padding-bottom: .5em; }
+  .anahtar-ad { margin-left: 8px; color: var(--soluk); }
+  .anahtar-liste { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .anahtar-dugme {
+    width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%;
+    border: 1px solid transparent; transition: border-color .2s, transform .2s var(--hiz);
+  }
+  .anahtar-dugme :global(.ornek) { width: 24px; height: 24px; }
+  .anahtar-dugme:hover { transform: scale(1.08); }
+  .anahtar-dugme[aria-pressed='true'] { border-color: var(--yazi); }
+  .kol { margin-bottom: clamp(32px, 5vw, 72px); }
+  .kol-kapak { position: relative; aspect-ratio: 2 / 1; max-height: 78svh; width: 100%; }
+  .kol-kapak img { position: absolute; inset: 0; }
+  .kol-kapak::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgb(0 0 0 / 0) 45%, rgb(0 0 0 / .78) 100%);
+  }
+  .kol-yazi {
+    position: absolute; inset: auto 0 0; z-index: 1;
+    display: grid; gap: 8px; padding-block: 0 clamp(22px, 3.4vw, 46px);
+  }
+  .kol-yazi .mono { color: var(--ikinci); }
+  .kol-yazi h3 { font-size: clamp(40px, 6vw, 96px); }
+  .kol-yazi p { max-width: 46ch; color: var(--ikinci); }
+  @media (max-width: 760px) {
+    .anahtar { justify-items: start; }
+    .anahtar-liste { justify-content: flex-start; }
+    .kol-kapak { aspect-ratio: 1 / 1; }
+    .kol-kapak img { object-position: 60% 50%; }
+  }
+
+  /* ---------------------------------------------------------------- her açıdan */
+  .galeri { padding-bottom: clamp(48px, 7vw, 100px); }
+  .duvar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .duvar-kare { display: block; aspect-ratio: 4 / 5; border-radius: 14px; }
+  .duvar-kare img { position: absolute; inset: 0; }
+  .duvar-kare::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, transparent 58%, rgb(0 0 0 / .62));
+    opacity: .9; transition: opacity .4s;
+  }
+  .duvar-yazi {
+    position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1;
+    display: grid; gap: 2px;
+  }
+  .duvar-yazi strong {
+    font-size: 12.5px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .duvar-yazi .mono { color: var(--ikinci); }
+  @media (hover: hover) {
+    .duvar-kare:hover img { transform: scale(1.04); }
+  }
+  @media (max-width: 1099px) { .duvar { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 699px) { .duvar { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .duvar-kare { border-radius: 10px; } }
+
+  /* ---------------------------------------------------------------- masada */
+  .masada { padding-bottom: clamp(48px, 7vw, 96px); }
+  .masada-yan { display: grid; justify-items: end; gap: 18px; }
+  .masada-ok { display: flex; gap: 8px; }
+  .ok {
+    width: 46px; height: 46px; border: 1px solid var(--cizgi-guclu); border-radius: 50%;
+    font: 16px/1 var(--mono); transition: background-color .2s, color .2s;
+  }
+  .ok:hover { background: var(--yazi); color: var(--siyah); }
+  .masada-serit {
+    display: grid; grid-auto-flow: column; grid-auto-columns: clamp(270px, 29vw, 520px); gap: 16px;
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--kenar); padding-inline: var(--kenar);
+    scrollbar-width: none; cursor: grab;
+  }
+  .masada-serit::-webkit-scrollbar { display: none; }
+  .masada-serit.cekiliyor { cursor: grabbing; scroll-snap-type: none; }
+  .masada-serit.cekiliyor * { pointer-events: none; }
+  .masada-kare { scroll-snap-align: start; display: grid; gap: 14px; }
+  .masada-gorsel { overflow: hidden; background: var(--kutu); border-radius: 14px; }
+  .masada-gorsel :global(img) {
+    width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover;
+    transition: transform 1.1s var(--hiz);
+  }
+  .masada-kare:hover .masada-gorsel :global(img) { transform: scale(1.03); }
+  .masada-yazi { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; font-size: 14px; }
+  .masada-yazi strong {
+    font-size: 12.5px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .masada-yazi span:last-child { grid-column: 2; }
+  .masada-alt { margin-top: 28px; }
+  .ilerleme { height: 1px; background: var(--cizgi); overflow: hidden; }
+  .ilerleme span { display: block; height: 100%; background: var(--yazi); width: 20%; }
+  @media (max-width: 760px) {
+    .masada-yan { justify-items: start; }
+    .masada-ok { display: none; }
+    .masada-serit { grid-auto-columns: 78vw; gap: 12px; }
+  }
+
+  /* ---------------------------------------------------------------- yüzeyler */
+  .yuzeyler { padding-bottom: clamp(40px, 6vw, 80px); }
+  .dizi {
+    display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
+    border-block: 1px solid var(--c);
+  }
+  .dizi-oge { border-right: 1px solid var(--c); min-width: 0; }
+  .dizi-oge:last-child { border-right: 0; }
+  .dizi-yazi { display: grid; gap: 3px; padding: 0 14px 20px; font-size: 13px; }
+  .dizi-ad {
+    font-size: 12px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .dizi-ipucu { padding-top: 18px; }
+  @media (max-width: 1100px) {
+    .dizi {
+      grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 44vw;
+      overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    }
+    .dizi-oge { scroll-snap-align: start; }
+    .dizi-ipucu { display: none; }
+  }
+  @media (hover: none) { .dizi-ipucu { display: none; } }
+
+  /* ---------------------------------------------------------------- hikâye */
+  .hikaye { padding-block: clamp(64px, 10vw, 150px); }
+  .hikaye-ic {
+    display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px clamp(32px, 6vw, 110px);
+    grid-template-areas: 'no no' 'baslik gorsel' 'metin gorsel' 'olgu olgu';
+  }
+  .hikaye-ic .bolum-no { grid-area: no; }
+  .hikaye-baslik { grid-area: baslik; font-size: clamp(52px, 7.6vw, 128px); line-height: .95; max-width: 9ch; }
+  .hikaye-metin { grid-area: metin; display: grid; gap: 16px; max-width: 54ch; font-size: 17px; color: var(--ikinci); }
+  .hikaye-gorsel { grid-area: gorsel; display: grid; gap: 12px; align-self: start; }
+  .hikaye-gorsel :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
+  .olgular {
+    grid-area: olgu; display: flex; flex-wrap: wrap; gap: 14px 40px;
+    padding-top: 28px; border-top: 1px solid var(--cizgi); color: var(--soluk);
+  }
+  .olgular li { display: flex; align-items: center; gap: 10px; }
+  .olgular :global(.isaret) { width: 9px; height: 9px; color: var(--yazi); }
+  @media (max-width: 900px) {
+    .hikaye-ic { grid-template-columns: 1fr; grid-template-areas: 'no' 'baslik' 'metin' 'gorsel' 'olgu'; }
+  }
+
+  /* ---------------------------------------------------------------- adımlar */
+  .adimlar { padding-bottom: clamp(64px, 9vw, 130px); }
+  .adim-liste { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .adim-liste li {
+    display: grid; align-content: start; gap: 12px; padding: 26px 26px 30px;
+    background: var(--kutu); border-radius: 18px;
+  }
+  .adim-no { color: var(--soluk); }
+  .adim-ad { font-size: clamp(24px, 2.4vw, 34px); font-weight: 640; letter-spacing: -0.03em; }
+  .adim-liste p { max-width: 34ch; }
+  .iade {
+    display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap;
+    margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--cizgi);
+  }
+  @media (max-width: 760px) {
+    .adim-liste { grid-template-columns: 1fr; }
+  }
+</style>

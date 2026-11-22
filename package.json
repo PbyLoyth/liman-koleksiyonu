@@ -8,15 +8,16 @@
     "build": "astro build",
     "preview": "astro preview --port 4342",
     "gorseller": "node tools/gorseller.mjs",
-    "yayinla": "node tools/yayinla.mjs"
+    "yayinla": "node tools/yayinla.mjs",
+    "kareler": "node tools/kareler.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/grenze-gotisch": "^5.3.0",
     "@fontsource-variable/mona-sans": "^5.3.0",
-    "@fontsource/unifrakturmaguntia": "^5.3.0",
     "astro": "^7.4.4"
   },
   "devDependencies": {
+    "@fontsource/fragment-mono": "^5.3.0",
+    "@fontsource/new-rocker": "^5.3.0",
     "sharp": "^0.35.5"
   }
 }

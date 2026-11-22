@@ -1,98 +1,156 @@
 ---
-import { Image, getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Ornek from './Ornek.astro';
 import UrunKart from './UrunKart.astro';
 import SiparisPenceresi from './SiparisPenceresi.astro';
 import { site } from '../data/site.js';
-import { urunler, ortak } from '../data/urunler.js';
+import { urunler, ortak, kod, koleksiyonAdi } from '../data/urunler.js';
 import { yuzeyler, yuzeyBul, yuzeyAdi, yuzeyKisa, palet } from '../data/yuzeyler.js';
-import { cekimler, cekimAdi, urunGorseli } from '../data/gorseller.js';
+import {
+  donusKok, ilkKare, masadaGorsel, sahneler, ogGorsel, cekildi, foto, fotoVar, cekimAdi, KARE,
+} from '../data/gorseller.js';
 import { yol, urunYolu, tl } from '../data/yol.js';
 
 interface Props { u: any; secili: string; }
 const { u, secili } = Astro.props;
 const Y = yuzeyBul(secili);
+const secenekler = yuzeyler.filter((y) => y.id === 'tuz' || cekildi(u.slug, y.id));
 
 const baslik = secili === 'tuz' ? `${u.ad} · ${u.rol} — Savana Season` : `${u.ad} · ${yuzeyAdi(Y, u)} — Savana Season`;
 const aciklama = `${u.rol}. ${u.kaynak}`;
-const og = await getImage({ src: urunGorseli(u.slug, secili, 'aci'), width: 1200, format: 'jpg' });
+const kok = donusKok(u.slug, secili);
+const ilk = ilkKare(kok);
+const masada = masadaGorsel(u.slug);
+const sahne = sahneler[u.slug];
+const CEKIMLER = ['aci', 'ust'];
+const fotolar = (yid) => Object.fromEntries(CEKIMLER.map((c) => [c, fotoVar(u.slug, yid, c) ? foto(u.slug, yid, c) : null]));
+const ilkFotolar = fotolar(secili);
+const etiket = (y) => (y.id === 'renk' ? `${yuzeyAdi(y, u)} · kendi rengi` : y.lansman ? `${y.ad} · lansman rengi` : y.ad);
 
-const veri = { ad: u.ad, rol: u.rol, fiyat: tl(u.fiyat), yakinda: !!u.yakinda, kanallar: site.siparis, yuzeyler: {} };
-for (const y of yuzeyler) {
-  const k = await getImage({ src: urunGorseli(u.slug, y.id, 'aci'), width: 160, format: 'webp' });
-  veri.yuzeyler[y.id] = {
-    ad: yuzeyAdi(y, u),
-    kisa: yuzeyKisa(y, u),
-    yol: urunYolu(u.slug, y.id),
-    tam: new URL(urunYolu(u.slug, y.id), Astro.site).href,
-    kucuk: k.src,
-  };
-}
+const veri = {
+  ad: u.ad, rol: u.rol, fiyat: tl(u.fiyat), yakinda: !!u.yakinda, kanallar: site.siparis,
+  yuzeyler: Object.fromEntries(
+    secenekler.map((y) => [y.id, {
+      ad: yuzeyAdi(y, u),
+      etiket: etiket(y),
+      kisa: yuzeyKisa(y, u),
+      yol: urunYolu(u.slug, y.id),
+      tam: new URL(urunYolu(u.slug, y.id), Astro.site).href,
+      kok: donusKok(u.slug, y.id),
+      fotolar: fotolar(y.id),
+    }]),
+  ),
+};
 
-// Diğer parçalar: önce aynı koleksiyondan, sonra öbüründen; toplam üç
+// Diğer parçalar: önce aynı koleksiyondan, sonra öbüründen; toplam dört
 const sira = urunler.filter((d) => !d.yakinda && d.slug !== u.slug);
-const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira.filter((d) => d.koleksiyon !== u.koleksiyon)].slice(0, 3);
+const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira.filter((d) => d.koleksiyon !== u.koleksiyon)].slice(0, 4);
 ---
-<Base baslik={baslik} aciklama={aciklama} gorsel={og.src}>
-  <div class="urun" data-urun data-secili={secili}>
-    <div class="kap">
-      <nav class="kirinti" aria-label="Konum">
-        <a href={`${yol('')}#${u.koleksiyon}`}>{u.koleksiyon === 'katedral' ? 'Katedral' : 'Liman'}</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">{u.ad}</span>
-      </nav>
-    </div>
+<Base baslik={baslik} aciklama={aciklama} gorsel={ogGorsel(u.slug, secili)}>
+  <article class="urun koyu" data-ton="koyu" data-urun data-secili={secili}>
+    <div class="urun-duzen">
+      <div class="sahne">
+        <div class="cerceve havuz">
+          <div
+            class="donus sahne-donus"
+            data-donus
+            data-mod="surukle"
+            data-kok={kok}
+            data-kare={KARE}
+            tabindex="0"
+            role="slider"
+            aria-label={`${u.ad}: döndürmek için sürükleyin ya da ok tuşlarını kullanın`}
+            aria-valuemin="0"
+            aria-valuemax={KARE - 1}
+            aria-valuenow="0"
+            aria-valuetext="0°"
+            style={`view-transition-name: u-${u.slug}`}
+          >
+            <img
+              src={ilk.src}
+              srcset={ilk.srcset}
+              sizes="(min-width: 1000px) 56vw, 100vw"
+              width="1000"
+              height="1250"
+              alt={`${u.ad}, ${yuzeyAdi(Y, u)} yüzey`}
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </div>
+          <p class="mono kose kose-sol">{kod(u)} — 360°</p>
+          <p class="mono kose kose-sag" data-derece>0°</p>
+          <div class="cetvel" aria-hidden="true">
+            {Array.from({ length: KARE }, (_, i) => <span class:list={[i === 0 && 'etkin', i % 6 === 0 && 'uzun']} />)}
+          </div>
+          <p class="mono ipucu" data-ipucu><span aria-hidden="true">←</span> Sürükle, döndür <span aria-hidden="true">→</span></p>
+        </div>
 
-    <div class="kap urun-duzen">
-      <div class="galeri">
-        {yuzeyler.map((y) => {
-          const liste = cekimler(u, y.id);
-          return (
-            <div class="galeri-set" data-set={y.id} hidden={y.id !== secili}>
-              <div class="galeri-serit" tabindex="0" aria-label={`${u.ad}, ${yuzeyAdi(y, u)} görselleri`}>
-                {liste.map((c, n) => (
-                  <figure class="galeri-kare">
-                    <Image
-                      src={c.img}
-                      quality={74} widths={[640, 960, 1280, 1600]}
-                      sizes="(min-width: 960px) 56vw, 100vw"
-                      alt={c.cekim === 'kullanim' ? `${u.ad}, kullanımda` : `${u.ad}, ${yuzeyAdi(y, u)} yüzey, ${cekimAdi[c.cekim]}`}
-                      loading={y.id === secili && n === 0 ? 'eager' : 'lazy'}
-                      fetchpriority={y.id === secili && n === 0 ? 'high' : 'auto'}
-                    />
-                  </figure>
-                ))}
-              </div>
-              {liste.length > 1 && (
-                <div class="galeri-nokta" aria-hidden="true">
-                  {liste.map((_, n) => <span class:list={[n === 0 && 'etkin']} />)}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        <div class="fotolar">
+          {CEKIMLER.map((c) => {
+            const f = ilkFotolar[c];
+            return (
+              <figure class="foto-kare foto" data-foto={c} hidden={!f}>
+                <img
+                  src={f?.src ?? ''}
+                  srcset={f?.srcset ?? ''}
+                  sizes="(min-width: 1000px) 28vw, 50vw"
+                  width="1200"
+                  height="1500"
+                  alt={`${u.ad}, ${yuzeyAdi(Y, u)} yüzey, ${cekimAdi[c].toLocaleLowerCase('tr-TR')}`}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption class="mono"><span>{cekimAdi[c]}</span> · <span data-foto-yuzey>{yuzeyAdi(Y, u)}</span></figcaption>
+              </figure>
+            );
+          })}
+        </div>
+
+        {masada && (
+          <figure class="masada-kare foto">
+            <Image
+              src={masada}
+              widths={[640, 960, 1280, 1600]}
+              sizes="(min-width: 1000px) 56vw, 100vw"
+              quality={78}
+              alt={`${u.ad}, kullanımda: ${sahne?.sahne?.toLocaleLowerCase('tr-TR') ?? ''}`}
+              loading="lazy"
+            />
+            <figcaption class="mono">Masada · {sahne?.sahne} · {yuzeyAdi(yuzeyBul(sahne?.yuzey), u)}</figcaption>
+          </figure>
+        )}
       </div>
 
-      <div class="bilgi">
-        <div class="bilgi-yapiskan">
-          {u.yakinda && <span class="rozet">Yakında</span>}
-          <p class="ust-baslik">{u.koleksiyon === 'katedral' ? 'Katedral' : 'Liman'} koleksiyonu</p>
-          <h1>{u.ad}</h1>
-          <p class="bilgi-rol">{u.rol}</p>
-          <p class="bilgi-fiyat">{tl(u.fiyat)}</p>
+      <aside class="bilgi" aria-label="Ürün bilgisi">
+        <div class="bilgi-ic">
+          <nav class="mono kirinti" aria-label="Konum">
+            <a href={`${yol('')}#${u.koleksiyon}`}>{koleksiyonAdi(u.koleksiyon)}</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{kod(u)}</span>
+            {u.yakinda && <span class="rozet">Yakında</span>}
+          </nav>
+          <h1 class="baslik bilgi-ad">{u.ad}</h1>
+          <div class="bilgi-alt">
+            <p class="bilgi-rol">{u.rol}</p>
+            <p class="mono bilgi-fiyat">{tl(u.fiyat)}</p>
+          </div>
 
           <div class="secim">
-            <p class="secim-bas">Yüzey: <strong data-yuzey-ad>{yuzeyAdi(Y, u)}</strong></p>
+            <p class="secim-bas">
+              <span class="ust soluk">Yüzey</span>
+              <strong data-yuzey-ad>{etiket(Y)}</strong>
+            </p>
             <ul class="secim-liste">
-              {yuzeyler.map((y) => (
+              {secenekler.map((y) => (
                 <li>
                   <a
-                    class="sw"
+                    class:list={['sw', y.lansman && 'sw-lansman']}
                     href={urunYolu(u.slug, y.id)}
                     data-yuzey={y.id}
-                    aria-label={yuzeyAdi(y, u)}
-                    title={yuzeyAdi(y, u)}
+                    aria-label={etiket(y)}
+                    title={etiket(y)}
                     aria-current={y.id === secili ? 'true' : undefined}
                   >
                     <Ornek yuzey={y.id} renk={y.id === 'renk' ? palet[u.imza.ad] : undefined} />
@@ -100,82 +158,110 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
                 </li>
               ))}
             </ul>
-            <p class="secim-not" data-yuzey-kisa>{yuzeyKisa(Y, u)}</p>
+            <p class="secim-not soluk" data-yuzey-kisa>{yuzeyKisa(Y, u)}</p>
           </div>
 
-          <button class="dugme dugme-genis" type="button" data-siparis-ac data-ana-dugme>
+          <button class="dugme genis" type="button" data-siparis-ac data-ana-dugme>
             {u.yakinda ? 'Çıkınca haber ver' : 'Sipariş ver'}
           </button>
+          <p class="mono soluk guven">Siparişle dökülür · 14 gün iade · İade kargosu bizden</p>
 
           <div class="bilgi-metin">
             <p>{u.kaynak}</p>
             <p>{u.metin}</p>
           </div>
-          <ul class="guven">
-            <li>Siparişle, elde dökülür</li>
-            <li>14 gün içinde iade, kargo bizden</li>
-          </ul>
+
+          <dl class="oz">
+            {[...u.ozellik, ...ortak].map(([k, v]) => (
+              <div><dt class="mono">{k}</dt><dd>{v}</dd></div>
+            ))}
+            {u.uyari && <div><dt class="mono">Güvenlik</dt><dd>{u.uyari}</dd></div>}
+          </dl>
         </div>
-      </div>
+      </aside>
     </div>
+  </article>
 
-    <section class="kap ozellikler" aria-labelledby="oz-bas">
-      <h2 id="oz-bas">Ölçü ve bakım</h2>
-      <dl class="oz-liste">
-        {[...u.ozellik, ...ortak].map(([k, v]) => (
-          <div><dt>{k}</dt><dd>{v}</dd></div>
-        ))}
-        {u.uyari && <div><dt>Güvenlik</dt><dd>{u.uyari}</dd></div>}
-      </dl>
-    </section>
-
-    <section class="kap diger" aria-labelledby="diger-bas">
-      <h2 id="diger-bas">Diğer parçalar</h2>
-      <div class="izgara">
-        {digerleri.map((d) => <UrunKart u={d} />)}
+  <section class="diger koyu" data-ton="koyu" aria-labelledby="diger-bas">
+    <div class="kap bas">
+      <div>
+        <p class="bolum-no">Koleksiyondan</p>
+        <h2 id="diger-bas" class="baslik">Diğer parçalar. <span class="soluk">Hepsi elde dökülür.</span></h2>
       </div>
-    </section>
-
-    <div class="alt-cubuk" data-alt-cubuk>
-      <div class="alt-cubuk-ad">
-        <strong>{u.ad}</strong>
-        <span data-cubuk-yuzey>{yuzeyAdi(Y, u)}</span>
-      </div>
-      <button class="dugme" type="button" data-siparis-ac>
-        {u.yakinda ? 'Haber ver' : `Sipariş ver · ${tl(u.fiyat)}`}
-      </button>
+      <a class="ok-bag" href={`${yol('')}#koleksiyon`}>Bütün koleksiyon <span aria-hidden="true">→</span></a>
     </div>
+    <ul class="izgara">
+      {digerleri.map((d) => <UrunKart u={d} />)}
+    </ul>
+  </section>
 
-    <SiparisPenceresi ad={u.ad} fiyat={tl(u.fiyat)} yakinda={u.yakinda} />
+  <div class="alt-cubuk" data-alt-cubuk>
+    <div class="alt-cubuk-ad">
+      <strong>{u.ad}</strong>
+      <span class="mono" data-cubuk-yuzey>{yuzeyAdi(Y, u)}</span>
+    </div>
+    <button class="dugme" type="button" data-siparis-ac>
+      {u.yakinda ? 'Haber ver' : `Sipariş ver · ${tl(u.fiyat)}`}
+    </button>
   </div>
+
+  <SiparisPenceresi ad={u.ad} fiyat={tl(u.fiyat)} yakinda={u.yakinda} />
   <script type="application/json" id="urun-veri" set:html={JSON.stringify(veri)} />
 </Base>
 
 <script>
+  import { donuslerKur, donusBul } from '../scripts/donus';
+
+  donuslerKur();
   const kok = document.querySelector<HTMLElement>('[data-urun]')!;
   const veri = JSON.parse(document.getElementById('urun-veri')!.textContent!);
   let secili = kok.dataset.secili!;
-  const setler = [...kok.querySelectorAll<HTMLElement>('[data-set]')];
+  const sahne = kok.querySelector<HTMLElement>('.sahne-donus')!;
+  const don = donusBul(sahne)!;
+
+  // Cetvel ve derece: dönüşü izler; ipucu ilk dokunuşta söner
+  const cizgiler = [...kok.querySelectorAll<HTMLElement>('.cetvel span')];
+  const derece = kok.querySelector<HTMLElement>('[data-derece]')!;
+  const ipucu = kok.querySelector<HTMLElement>('[data-ipucu]')!;
+  let onceki = 0;
+  sahne.addEventListener('donus:kare', (e) => {
+    const { n, kare } = (e as CustomEvent).detail;
+    cizgiler[onceki]?.classList.remove('etkin');
+    cizgiler[n]?.classList.add('etkin');
+    onceki = n;
+    derece.textContent = `${Math.round((n * 360) / kare)}°`;
+  });
+  const sondur = () => ipucu.classList.add('sondu');
+  sahne.addEventListener('pointerdown', sondur, { once: true });
+  sahne.addEventListener('keydown', sondur, { once: true });
+
+  // Yüzey seçimi: dönüş kareleri ve fotoğraflar değişir, açı korunur; adres yüzeyin sayfasına geçer
   const ornekler = [...kok.querySelectorAll<HTMLAnchorElement>('.secim-liste .sw')];
   const adEl = kok.querySelector('[data-yuzey-ad]')!;
   const kisaEl = kok.querySelector('[data-yuzey-kisa]')!;
-  const cubukYuzey = kok.querySelector('[data-cubuk-yuzey]')!;
-
-  // Yüzey seçimi: sayfa yenilenmeden görseller değişir, adres yüzeyin kendi sayfasına geçer (paylaşılabilir)
+  const cubukYuzey = document.querySelector('[data-cubuk-yuzey]')!;
+  const fotoKareleri = [...kok.querySelectorAll<HTMLElement>('[data-foto]')];
   function yuzeySec(id: string) {
     const y = veri.yuzeyler[id];
     if (!y || id === secili) return;
     secili = id;
     kok.dataset.secili = id;
-    setler.forEach((s) => (s.hidden = s.dataset.set !== id));
     ornekler.forEach((a) => (a.dataset.yuzey === id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
-    adEl.textContent = y.ad;
+    adEl.textContent = y.etiket;
     kisaEl.textContent = y.kisa;
     cubukYuzey.textContent = y.ad;
     document.title = id === 'tuz' ? `${veri.ad} · ${veri.rol} — Savana Season` : `${veri.ad} · ${y.ad} — Savana Season`;
     history.replaceState(null, '', y.yol);
-    const serit = kok.querySelector<HTMLElement>(`[data-set="${id}"] .galeri-serit`);
-    if (serit) serit.scrollLeft = 0;
+    don.kokDegistir(y.kok);
+    fotoKareleri.forEach((fk) => {
+      const f = y.fotolar[fk.dataset.foto!];
+      fk.hidden = !f;
+      if (!f) return;
+      const im = fk.querySelector('img')!;
+      im.srcset = f.srcset;
+      im.src = f.src;
+      fk.querySelector('[data-foto-yuzey]')!.textContent = y.ad;
+    });
   }
   ornekler.forEach((a) =>
     a.addEventListener('click', (e) => {
@@ -185,28 +271,13 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
     }),
   );
 
-  // Telefonda kaydırmalı galeri: nokta göstergesi
-  kok.querySelectorAll<HTMLElement>('.galeri-set').forEach((set) => {
-    const serit = set.querySelector<HTMLElement>('.galeri-serit');
-    const noktalar = [...set.querySelectorAll('.galeri-nokta span')];
-    if (!serit || !noktalar.length) return;
-    serit.addEventListener(
-      'scroll',
-      () => {
-        const n = Math.round(serit.scrollLeft / Math.max(1, serit.clientWidth));
-        noktalar.forEach((s, j) => s.classList.toggle('etkin', j === n));
-      },
-      { passive: true },
-    );
-  });
-
   // Telefonda alt çubuk: ana sipariş düğmesi görünmüyorken çıkar
-  const cubuk = kok.querySelector<HTMLElement>('[data-alt-cubuk]')!;
+  const cubuk = document.querySelector<HTMLElement>('[data-alt-cubuk]')!;
   const ana = kok.querySelector<HTMLElement>('[data-ana-dugme]')!;
-  new IntersectionObserver(([g]) => cubuk.classList.toggle('acik', !g.isIntersecting)).observe(ana);
+  new IntersectionObserver(([g]) => cubuk.classList.toggle('acik', !g.isIntersecting && g.boundingClientRect.top < 0)).observe(ana);
 
   // Sipariş penceresi
-  const dlg = kok.querySelector<HTMLDialogElement>('[data-siparis]')!;
+  const dlg = document.querySelector<HTMLDialogElement>('[data-siparis]')!;
   const durum = dlg.querySelector<HTMLElement>('[data-sp-durum]')!;
   const metin = dlg.querySelector<HTMLTextAreaElement>('[data-sp-mesaj]')!;
   const mesaj = () => {
@@ -220,7 +291,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
     const m = mesaj();
     const k = veri.kanallar;
     dlg.querySelector('[data-sp-yuzey]')!.textContent = y.ad;
-    dlg.querySelector<HTMLImageElement>('[data-sp-img]')!.src = y.kucuk;
+    dlg.querySelector<HTMLImageElement>('[data-sp-img]')!.src = `${y.kok}k/${String(don.n).padStart(2, '0')}.webp`;
     metin.value = m;
     durum.textContent = '';
     const wa = dlg.querySelector<HTMLAnchorElement>('[data-kanal="whatsapp"]');
@@ -241,10 +312,117 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
     }
     durum.textContent = 'Mesaj kopyalandı.';
   }
-  kok.querySelectorAll('[data-siparis-ac]').forEach((b) => b.addEventListener('click', ac));
+  document.querySelectorAll('[data-siparis-ac]').forEach((b) => b.addEventListener('click', ac));
   dlg.querySelector('[data-kopyala]')!.addEventListener('click', kopyala);
   dlg.querySelector('[data-kanal="instagram"]')?.addEventListener('click', kopyala);
   dlg.addEventListener('click', (e) => {
     if (e.target === dlg) dlg.close();
   });
 </script>
+
+<style>
+  .urun { padding-top: var(--ub-y); }
+  .urun-duzen {
+    display: grid; grid-template-columns: minmax(0, 1.32fr) minmax(380px, 1fr);
+    border-bottom: 1px solid var(--c);
+  }
+  .sahne { min-width: 0; display: grid; gap: 10px; padding: 0 10px 10px; }
+  .cerceve { position: relative; padding-block: 8px 64px; border-radius: 0 0 22px 22px; }
+  .sahne-donus { width: min(100%, calc((100svh - var(--ub-y) - 72px) * .8)); margin-inline: auto; }
+  .sahne-donus:focus-visible { outline-offset: -8px; }
+  .kose { position: absolute; top: 18px; color: var(--soluk); }
+  .kose-sol { left: 20px; }
+  .kose-sag { right: 20px; min-width: 4ch; text-align: right; }
+  .cetvel {
+    position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+    display: flex; align-items: flex-end; gap: 6px; height: 16px;
+  }
+  .cetvel span { width: 1px; height: 6px; background: var(--cizgi-guclu); transition: height .15s, background-color .15s; }
+  .cetvel span.uzun { height: 10px; background: rgb(255 255 255 / .4); }
+  .cetvel span.etkin { height: 16px; background: var(--yazi); }
+  .ipucu {
+    position: absolute; left: 50%; bottom: 50px; transform: translateX(-50%); white-space: nowrap;
+    color: var(--soluk); transition: opacity .6s;
+  }
+  .ipucu.sondu { opacity: 0; }
+
+  .fotolar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .foto-kare { aspect-ratio: 4 / 5; border-radius: 18px; }
+  .foto-kare[hidden] { display: none; }
+  .foto-kare img { position: absolute; inset: 0; }
+  .foto-kare figcaption, .masada-kare figcaption {
+    position: absolute; left: 16px; bottom: 14px; z-index: 1; color: var(--yazi);
+    text-shadow: 0 1px 14px rgb(0 0 0 / .6);
+  }
+  .masada-kare { border-radius: 18px; }
+  .masada-kare :global(img) { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+
+  .bilgi { min-width: 0; border-left: 1px solid var(--c); }
+  .bilgi-ic {
+    position: sticky; top: var(--ub-y);
+    display: grid; gap: 22px; padding: clamp(28px, 3.6vw, 56px);
+  }
+  .kirinti { display: flex; align-items: center; gap: 8px; color: var(--soluk); }
+  .kirinti a:hover { color: var(--yazi); }
+  .rozet { margin-left: auto; color: var(--kan); }
+  .bilgi-ad { font-size: clamp(48px, 5.6vw, 88px); }
+  .bilgi-alt {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--c);
+  }
+  .bilgi-rol { font-size: 19px; color: var(--ikinci); letter-spacing: -0.01em; }
+  .bilgi-fiyat { font-size: 15px; }
+  .secim-bas { display: flex; align-items: baseline; gap: 12px; }
+  .secim-bas strong { font-weight: 620; font-size: 15px; }
+  .secim-liste { display: flex; flex-wrap: wrap; gap: 4px; margin-block: 10px 6px; }
+  .sw {
+    width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%;
+    border: 1px solid transparent; transition: border-color .2s, transform .2s var(--hiz);
+  }
+  .sw:hover { transform: scale(1.06); }
+  .sw[aria-current='true'] { border-color: var(--yazi); }
+  .sw :global(.ornek) { width: 28px; height: 28px; }
+  .sw-lansman { position: relative; }
+  .sw-lansman::after {
+    content: ''; position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--yazi); box-shadow: 0 0 0 2px var(--siyah);
+  }
+  .secim-not { font-size: 14px; }
+  .genis { width: 100%; }
+  .guven { margin-top: -10px; }
+  .bilgi-metin { display: grid; gap: 12px; font-size: 16px; max-width: 52ch; color: var(--ikinci); }
+  .oz { border-top: 1px solid var(--c); }
+  .oz div {
+    display: grid; grid-template-columns: 9em minmax(0, 1fr); gap: 16px;
+    padding: 12px 0; border-bottom: 1px solid var(--c); font-size: 14px;
+  }
+  .oz dt { color: var(--soluk); padding-top: 2px; }
+
+  .diger { padding-bottom: clamp(40px, 6vw, 90px); }
+
+  .alt-cubuk {
+    position: fixed; inset: auto 0 0; z-index: 55;
+    display: none; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px var(--kenar) max(10px, env(safe-area-inset-bottom));
+    background: rgb(0 0 0 / .82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--cizgi);
+    transform: translateY(110%); transition: transform .45s var(--yay);
+  }
+  .alt-cubuk.acik { transform: none; }
+  .alt-cubuk-ad { display: grid; line-height: 1.3; }
+  .alt-cubuk-ad strong { font-size: 12.5px; font-weight: 650; font-stretch: 125%; letter-spacing: .12em; text-transform: uppercase; }
+  .alt-cubuk-ad .mono { color: var(--soluk); }
+  .alt-cubuk .dugme { min-height: 44px; padding: 0 18px; font-size: 14px; }
+
+  @media (max-width: 999px) {
+    .urun-duzen { grid-template-columns: 1fr; }
+    .sahne { display: contents; }
+    .cerceve { order: 1; }
+    .bilgi { order: 2; border-left: 0; }
+    .fotolar { order: 3; padding: 0 10px; }
+    .masada-kare { order: 4; margin: 10px 10px 0; }
+    .bilgi-ic { position: static; }
+    .sahne-donus { width: min(100%, 560px); }
+    .alt-cubuk { display: flex; }
+  }
+</style>

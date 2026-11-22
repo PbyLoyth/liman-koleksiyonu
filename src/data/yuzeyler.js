@@ -1,4 +1,5 @@
-// Altı yüzey. "renk" her ürünün kendi imza rengidir (urunler.js > imza).
+// Sekiz yüzey. "renk" her ürünün kendine özgü rengidir (urunler.js > imza; iki ürün aynı renkte değil).
+// "lansman" bütün ürünlerde aynı: ayna gibi krom kaplama.
 export const palet = {
   'Tuz Beyazı': '#E4E1DA',
   'Liman Grisi': '#8E918C',
@@ -7,6 +8,14 @@ export const palet = {
   Kömür: '#3A3C3B',
   'Gece Mavisi': '#34465A',
   Grafit: '#55585A',
+  Şarap: '#5E2630',
+  'Gül Kurusu': '#B98C86',
+  Petrol: '#2E5B5E',
+  Hardal: '#B08A3A',
+  Kum: '#C9B79C',
+  'İşaret Kırmızısı': '#A3372B',
+  'Vitray Moru': '#5E4F72',
+  Krom: '#B9BCC1',
 };
 
 export const yuzeyler = [
@@ -15,6 +24,19 @@ export const yuzeyler = [
     ad: 'Tuz',
     kisa: 'Beyaz beton, koyu derz',
     metin: 'Koleksiyonun ilk hâli: beyaz beton, ince koyu derzler.',
+  },
+  {
+    id: 'renk',
+    ad: 'Renk',
+    kisa: 'Ürüne özgü renk',
+    metin: 'Her parçanın kendine özgü rengi; iki parça aynı renkte değil.',
+  },
+  {
+    id: 'lansman',
+    ad: 'Krom',
+    kisa: 'Lansman rengi: ayna gibi krom',
+    metin: 'Lansmana özel: ayna gibi krom kaplama, siyah derz. Bütün parçalarda aynı.',
+    lansman: true,
   },
   {
     id: 'grafit',
@@ -45,12 +67,6 @@ export const yuzeyler = [
     ad: 'Su hattı',
     kisa: 'Beyaz, tabanda pas bandı',
     metin: 'Her parça aynı 9 mm çizgiye kadar pas rengine batırılmış gibi.',
-  },
-  {
-    id: 'renk',
-    ad: 'Renk',
-    kisa: 'Ürünün kendi rengi',
-    metin: 'Her parçanın limandan gelen kendi rengi.',
   },
 ];
 

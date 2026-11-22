@@ -23,7 +23,7 @@ export const urunler = [
     fiyat: 1650,
     kaynak: 'Uçan payanda, katedralin duvarını dışarıdan tutan kemerli destektir.',
     metin: 'Şişe kirişin sırtındaki beşiğe yatar; dibi beşiğin ucuna, boynu kulenin çentiğine oturur.',
-    imza: { ad: 'Kömür', neden: 'Katedral taşının isli rengi' },
+    imza: { ad: 'Şarap', neden: 'Tuttuğu şarabın tortusu' },
     ozellik: [
       ['Ölçü', '252 × 72 × 155 mm'],
       ['Ağırlık', 'Yaklaşık 2,05 kg'],
@@ -39,7 +39,7 @@ export const urunler = [
     fiyat: 950,
     kaynak: 'Şapel, katedralin içindeki küçük ibadet odasıdır.',
     metin: 'Tealight’ın üstüne kapatılır; ışık iki sivri pencereden ve gözden dışarı süzülür. Tepedeki baca ısıyı atar.',
-    imza: { ad: 'Liman Grisi', neden: 'Taş şapelin grisi' },
+    imza: { ad: 'Vitray Moru', neden: 'Şapel vitrayının moru' },
     ozellik: [
       ['Ölçü', '96 × 96 × 142 mm'],
       ['Ağırlık', 'Yaklaşık 740 g'],
@@ -88,7 +88,7 @@ export const urunler = [
     fiyat: 490,
     kaynak: 'Gül pencere, katedral cephesindeki yuvarlak vitraydır.',
     metin: 'Tabanında pencerenin kurşun çizgileri derz olarak durur. Yüzük, küpe ve küçük eşyalar için.',
-    imza: { ad: 'Pas', neden: 'Gül pencerenin kızıllığı' },
+    imza: { ad: 'Gül Kurusu', neden: 'Kurumuş gül yaprağı' },
     ozellik: [
       ['Ölçü', 'Ø130 × 18 mm'],
       ['Ağırlık', 'Yaklaşık 335 g'],
@@ -105,7 +105,7 @@ export const urunler = [
     fiyat: 1250,
     kaynak: 'Keson, dalgakıranın içi hücreli beton kutusudur. Suyun altında durur, üstündeki duvar dalgayı geri çevirir.',
     metin: 'Telefon, kulaklık kutusu, yüzük ve bozuk para için hücreleri var. Arkadaki duvar telefona yaslanma yeri.',
-    imza: { ad: 'Gece Mavisi', neden: 'Kesonun durduğu derin su' },
+    imza: { ad: 'Petrol', neden: 'Kesonun durduğu derin su' },
     ozellik: [
       ['Ölçü', '260 × 130 × 44 mm'],
       ['Ağırlık', 'Yaklaşık 1,25 kg'],
@@ -171,7 +171,7 @@ export const urunler = [
     fiyat: 490,
     kaynak: 'Rıhtım, gemilerin yanaştığı duvardır; üstünde küçük bir baba durur.',
     metin: 'Çubuk tütsü babadaki yuvada eğik durur, külü kanala düşer. Palo santo kanala yatar.',
-    imza: { ad: 'Yosun', neden: 'Rıhtım duvarındaki yosun' },
+    imza: { ad: 'Hardal', neden: 'Rıhtım babalarının sarı boyası' },
     ozellik: [
       ['Ölçü', '200 × 42 × 28 mm'],
       ['Ağırlık', 'Yaklaşık 280 g'],
@@ -189,7 +189,7 @@ export const urunler = [
     fiyat: 450,
     kaynak: 'Antifer, dört yüzü oluklu dalgakıran küpüdür; adını Fransa’daki Antifer limanından alır.',
     metin: 'Kâğıtları tutar, oluklarına kablo yatar.',
-    imza: { ad: 'Yosun', neden: 'Sudaki blokları saran yosun' },
+    imza: { ad: 'Kum', neden: 'Blokların yattığı kıyı kumu' },
     ozellik: [
       ['Ölçü', '58 × 58 × 58 mm'],
       ['Ağırlık', 'Yaklaşık 375 g'],
@@ -206,7 +206,7 @@ export const urunler = [
     yakinda: true,
     kaynak: 'Liman girişindeki mendirek feneri.',
     metin: 'Beton gövde, ışığı yumuşatan opal başlık. Elektrik aksamının uygunluk testleri bitince satışa çıkacak.',
-    imza: { ad: 'Kömür', neden: 'Gecenin içindeki fener' },
+    imza: { ad: 'İşaret Kırmızısı', neden: 'Liman girişindeki kırmızı fener' },
     ozellik: [
       ['Ölçü', 'Gövde 115 × 115 × 192 mm, toplam yaklaşık 295 mm'],
       ['Ağırlık', 'Yaklaşık 1,6 kg'],
@@ -223,3 +223,11 @@ export const ortak = [
 ];
 
 export const urunBul = (slug) => urunler.find((u) => u.slug === slug);
+
+export const koleksiyonAdi = (id) => koleksiyonlar.find((k) => k.id === id)?.ad ?? id;
+
+/** Katalog numarası: koleksiyonun baş harfi ve sıra (K—01, L—03) */
+export const kod = (u) => {
+  const sira = urunler.filter((d) => d.koleksiyon === u.koleksiyon).indexOf(u) + 1;
+  return `${u.koleksiyon === 'katedral' ? 'K' : 'L'}—${String(sira).padStart(2, '0')}`;
+};
