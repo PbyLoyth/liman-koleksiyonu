@@ -7,6 +7,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const sh = (k, cwd) => execSync(k, { stdio: 'inherit', cwd });
+// dist her yayında sıfırdan: derleme kaynaktan silinen dosyaları dist'te bırakıyor, onlar da yayına taşınıyordu
+rmSync('dist', { recursive: true, force: true });
 sh('npm run build');
 const uzak = execSync('git remote get-url origin').toString().trim();
 const gecici = mkdtempSync(join(tmpdir(), 'liman-yayin-'));

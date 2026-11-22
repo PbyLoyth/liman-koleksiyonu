@@ -1,20 +1,22 @@
 // Giriş görseli: seçilen yatay çekimi sıcak tonlu (sepya) kara-beyaza çevirir; afiş görsellerini ve video kaynaklarını
 // yazar. Telefon için dikey görüntü aynı çekimden kırpılır (mühür, mumlar ve kâse ortada kalır).
 // Mum ışığının sıcaklığı tek renk olarak kalır; geri kalan her şey kara-beyaz.
-// kullanım: node tools/giris.mjs <yatay.png> <kaynak çıktı klasörü> [dikey kırpma merkezi, 0-1 = 0.52]
+// kullanım: node tools/giris.mjs <yatay.png> <kaynak çıktı klasörü> [dikey kırpma merkezi, 0-1 = 0.52] [tonsuz]
+//   tonsuz: görsel zaten tonluysa (ör. hazır sepya tablo) renklerine dokunulmaz
 //   → public/g/giris-yatay-{1280,1920,2560}.webp, public/g/giris-dikey-{720,1080}.webp, public/og.jpg
 //   → <klasör>/giris-yatay-son.png (16:9) ve giris-dikey-son.png (9:16): video kaynakları
 import sharp from 'sharp';
 import { mkdirSync } from 'node:fs';
 
-const [YATAY, KLASOR, MERKEZ = '0.52'] = process.argv.slice(2);
+const [YATAY, KLASOR, MERKEZ = '0.52', TON_SECIMI = 'ton'] = process.argv.slice(2);
 mkdirSync('public/g', { recursive: true });
 mkdirSync(KLASOR, { recursive: true });
 
 // Sepya: tam gri ton ve hafif S eğrisi, sonra sıcak tonlama (parlaklık korunur). İki geçiş: sharp gri tonu boru
 // hattının sonunda uyguladığı için aynı geçişteki tonlamayı siler.
 const TON = { r: 168, g: 146, b: 118 };
-const tonla = async (girdi) => sharp(await sharp(girdi).greyscale().linear(1.08, -6).gamma(1.06).toColourspace('srgb').png().toBuffer()).tint(TON);
+const tonla = async (girdi) => TON_SECIMI === 'tonsuz' ? sharp(girdi)
+  : sharp(await sharp(girdi).greyscale().linear(1.08, -6).gamma(1.06).toColourspace('srgb').png().toBuffer()).tint(TON);
 
 const m = await sharp(YATAY).metadata();
 const yg = Math.min(3840, m.width - (m.width % 16)), yy = Math.round((yg * 9) / 16);

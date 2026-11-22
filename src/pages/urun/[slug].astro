@@ -12,6 +12,8 @@ const k = koleksiyonBul(u.koleksiyon);
 const ana = dikey(`${u.slug}-ana`);
 const detay = dikey(`${u.slug}-detay`);
 const digerleri = urunler.filter((d) => d.koleksiyon === u.koleksiyon && d.slug !== u.slug).slice(0, 4);
+const giyim = u.koleksiyon === 'giyim';
+const renk2 = (u.renkler ?? '').split(' · ')[1];
 ---
 <Taban baslik={`${u.ad} · ${u.rol} — ${marka.ad}`} aciklama={`${u.rol}, ${u.malzeme.toLocaleLowerCase('tr-TR')}. ${u.metin}`} gorsel={yol(`g/${u.slug}-ana-1200.webp`)}>
   <article class="kap urun">
@@ -20,7 +22,7 @@ const digerleri = urunler.filter((d) => d.koleksiyon === u.koleksiyon && d.slug 
         <img src={ana.src} srcset={ana.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={`${u.ad}: ${u.rol.toLocaleLowerCase('tr-TR')}, ${u.malzeme.toLocaleLowerCase('tr-TR')}`} fetchpriority="high" decoding="async" />
       </figure>
       <figure>
-        <img src={detay.src} srcset={detay.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={`${u.ad}, yakın ayrıntı`} loading="lazy" decoding="async" />
+        <img src={detay.src} srcset={detay.srcset} sizes="(min-width: 960px) 55vw, 100vw" width="1024" height="1280" alt={giyim ? `${u.ad}, ${renk2}` : `${u.ad}, yakın ayrıntı`} loading="lazy" decoding="async" />
       </figure>
     </div>
     <div class="bilgi">
@@ -32,7 +34,9 @@ const digerleri = urunler.filter((d) => d.koleksiyon === u.koleksiyon && d.slug 
         <dl class="oz">
           <div><dt class="harf soluk">No</dt><dd>{kod(u)}</dd></div>
           <div><dt class="harf soluk">Koleksiyon</dt><dd>{k.ad} — {k.satir}</dd></div>
-          <div><dt class="harf soluk">Malzeme</dt><dd>{u.malzeme}. Tek malzeme, boya ve kaplama yok.</dd></div>
+          {giyim
+            ? <><div><dt class="harf soluk">Kumaş</dt><dd>{u.malzeme}</dd></div><div><dt class="harf soluk">Renk</dt><dd>{u.renkler}</dd></div></>
+            : <div><dt class="harf soluk">Malzeme</dt><dd>{u.malzeme}. Tek malzeme, boya ve kaplama yok.</dd></div>}
           <div><dt class="harf soluk">Durum</dt><dd>Konsept. Henüz üretimde değil.</dd></div>
         </dl>
         <a class="harf geri" href={yol('')}>← Bütün nesneler</a>

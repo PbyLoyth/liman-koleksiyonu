@@ -17,7 +17,7 @@ const video = dosyaVar('g/giris-yatay.mp4');
   <section class="giris" data-giris aria-label="Giriş">
     <picture class="giris-afis">
       {dikey && <source media="(max-aspect-ratio: 4/5)" srcset={dikey} sizes="100vw" />}
-      <img src={yatay.src} srcset={yatay.srcset} sizes="100vw" width="1920" height="1080" alt="Uzun beton bir masada beton ve kararmış çelikten nesneler, mum ışığında; arkada duvarda büyük bir haç kabartması" fetchpriority="high" decoding="async" />
+      <img src={yatay.src} srcset={yatay.srcset} sizes="100vw" width="1920" height="1080" alt="Çarmıh sahnesi: karanlık gökyüzünün altında üç haç, bulutlardan inen bir ışık huzmesi ve melekler; tepenin çevresinde kalabalık. 19. yüzyıl tablosu." fetchpriority="high" decoding="async" />
     </picture>
     {video && (
       <video class="giris-video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"
@@ -33,7 +33,7 @@ const video = dosyaVar('g/giris-yatay.mp4');
       <button type="button" class="harf" data-suz="hepsi" aria-pressed="true">Hepsi</button>
       {koleksiyonlar.map((k) => <button type="button" class="harf" data-suz={k.id} aria-pressed="false">{k.ad}</button>)}
     </nav>
-    <p class="satir soluk" data-satir aria-live="polite">{urunler.length} nesne · üç kaynak · iki malzeme</p>
+    <p class="satir soluk" data-satir aria-live="polite">{urunler.filter((u) => u.koleksiyon !== 'giyim').length} nesne · {urunler.filter((u) => u.koleksiyon === 'giyim').length} giyim · üç kaynak</p>
     <ul class="izgara" data-izgara>
       {urunler.map((u) => <Kart u={u} />)}
     </ul>
@@ -90,6 +90,9 @@ const video = dosyaVar('g/giris-yatay.mp4');
 <style>
   .giris { position: relative; height: 100svh; min-height: 520px; overflow: hidden; background: var(--siyah); }
   .giris-afis img, .giris-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* tablo yerinde durur, çok yavaş yaklaşıp uzaklaşır */
+  .giris-afis img { transform-origin: 54% 46%; animation: nefes 28s ease-in-out infinite alternate; }
+  @keyframes nefes { from { transform: scale(1); } to { transform: scale(1.06); } }
   .giris-video { opacity: 0; transition: opacity 1.4s var(--yavas); }
   .giris-video.oynuyor { opacity: 1; }
   .giris::after {
@@ -118,5 +121,5 @@ const video = dosyaVar('g/giris-yatay.mp4');
   .suzgec button:hover { color: var(--yazi); }
   .suzgec button[aria-pressed='true'] { color: var(--yazi); border-color: var(--yazi); }
   .satir { text-align: center; font-size: 13px; padding: 14px 0 clamp(36px, 5vw, 64px); }
-  @media (prefers-reduced-motion: reduce) { .kaydir i::after { animation: none; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .kaydir i::after, .giris-afis img { animation: none; transform: none; } }
 </style>

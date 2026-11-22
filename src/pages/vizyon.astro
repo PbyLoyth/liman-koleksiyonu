@@ -32,7 +32,7 @@ const muhurFoto = var_('amblem', 1024);
   <section class="kap bolum" aria-labelledby="kaynak-bas">
     <h2 id="kaynak-bas" class="harf ortali">Üç kaynak</h2>
     <ul class="kaynaklar">
-      {koleksiyonlar.map((k) => {
+      {koleksiyonlar.filter((k) => k.tur !== 'giyim').map((k) => {
         const g = genis(k.gorsel);
         const n = urunler.filter((u) => u.koleksiyon === k.id).length;
         return (

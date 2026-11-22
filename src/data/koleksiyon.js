@@ -51,6 +51,13 @@ export const koleksiyonlar = [
     metin: 'Kiriş, somun, perçin, flanş, donatı, baca. Endüstrinin parçaları gotik ayrıntıyla yeniden çizilir; çelik taşır, beton tutar.',
     gorsel: 'kampanya-fabrika',
   },
+  {
+    id: 'giyim',
+    ad: 'Giyim',
+    tur: 'giyim',
+    satir: 'Bandana, kamuflaj, mühür.',
+    metin: 'Boxer ve şort: klasik paisley ve bandana kareleri, Savana Season kamuflajı ve düz renk Mühür serisi. Bel lastiğinde Old English logo, bacakta haç.',
+  },
 ];
 
 export const malzemeler = [
@@ -73,7 +80,7 @@ export const malzemeler = [
   },
 ];
 
-// 21 nesne. kod: koleksiyonun baş harfi ve sıra
+// 21 nesne ve 6 giyim. kod: koleksiyonun baş harfi ve sıra. Giyimde iki renk: ana görsel ilk renk, ikinci görsel öbür renk
 export const urunler = [
   // Katedral
   { slug: 'kemer', ad: 'Kemer', koleksiyon: 'katedral', rol: 'Kitap desteği', malzeme: 'Brüt beton',
@@ -120,6 +127,19 @@ export const urunler = [
     metin: 'Donatı izi ve tahta kalıp dokusu; gövdede katedral sütunu gibi oluklar.' },
   { slug: 'baca', ad: 'Baca', koleksiyon: 'fabrika', rol: 'Tütsülük', malzeme: 'Grafit beton',
     metin: 'Fabrika bacasının tepesinde gotik bir kule. Duman sivri yarıklardan çıkar.' },
+  // Giyim
+  { slug: 'bandana-boxer', ad: 'Bandana Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve elastan', renkler: 'Kara · Kemik',
+    metin: 'Her yanı klasik paisley. Jakar bel lastiğinde Old English Savana Season ve haç tekrarı.' },
+  { slug: 'bandana-sort', ad: 'Bandana Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Pamuk poplin', renkler: 'Kara · Kemik',
+    metin: 'Bandana kareleri yan yana; kenar şeritleri birbirine değer. Büzgülü bel, metal uçlu kordon, bacakta dokuma etiket.' },
+  { slug: 'kamuflaj-boxer', ad: 'Kamuflaj Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve elastan', renkler: 'Beton · Savana',
+    metin: 'Savana Season kamuflajı: Beton gri tonlarda, Savana kum, okra ve zeytinde. Kara jakar bel.' },
+  { slug: 'kamuflaj-sort', ad: 'Kamuflaj Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ripstop pamuk', renkler: 'Beton · Savana',
+    metin: 'Dikişsiz kamuflaj deseni, büzgülü bel ve kara kordon. Bacakta dokuma etiket.' },
+  { slug: 'muhur-boxer', ad: 'Mühür Boxer', koleksiyon: 'giyim', rol: 'Boxer', malzeme: 'Pamuk ve modal', renkler: 'Kara · Kemik',
+    metin: 'Düz renk. Jakar bel lastiği ve bacakta küçük haç nakışı.' },
+  { slug: 'muhur-sort', ad: 'Mühür Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Ağır penye', renkler: 'Kara · Beton',
+    metin: 'Düz renk ağır penye. Bacakta dikişli deri haç yama ve Old English logo nakışı.' },
 ];
 
 export const koleksiyonBul = (id) => koleksiyonlar.find((k) => k.id === id);

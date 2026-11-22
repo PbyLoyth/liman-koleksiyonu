@@ -13,7 +13,7 @@ const detay = dikey(`${u.slug}-detay`);
       <img class="detay" src={detay.src} srcset={detay.srcset} sizes={sizes} width="1024" height="1280" alt="" aria-hidden="true" loading="lazy" decoding="async" />
     </div>
     <p class="harf kart-ad">{u.ad}</p>
-    <p class="kart-alt soluk">{u.malzeme}</p>
+    <p class="kart-alt soluk">{u.renkler ?? u.malzeme}</p>
   </a>
 </li>
 

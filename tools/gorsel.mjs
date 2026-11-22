@@ -38,11 +38,12 @@ const kenar = (g, y) => Buffer.from(
   `<stop offset="0.62" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient></defs>` +
   `<rect width="100%" height="100%" fill="url(#k)"/></svg>`);
 
-async function yaz(kaynak, ad, genislikler, oran, kararma = false) {
+async function yaz(kaynak, ad, genislikler, oran, kararma = false, renkli = false) {
   if (!kaynak || !existsSync(kaynak)) { eksik.push(ad); return; }
   for (const g of genislikler) {
     const y = Math.round(g / oran);
-    let im = sharp(kaynak).resize(g, y, { fit: 'cover', position: 'centre', withoutEnlargement: true }).grayscale().linear(1.05, -3);
+    let im = sharp(kaynak).resize(g, y, { fit: 'cover', position: 'centre', withoutEnlargement: true });
+    if (!renkli) im = im.grayscale().linear(1.05, -3);
     if (kararma) {
       // büyütme yapılmadığı için gerçek boyut istenenden küçük olabilir: kararma katmanı gerçek boyutta
       const { data, info } = await im.toBuffer({ resolveWithObject: true });
@@ -69,6 +70,21 @@ for (const s of URUNLER) {
 for (const [slug, s] of Object.entries(ESKI)) {
   await yaz(`${R}/${s.ana}.png`, `${slug}-ana`, [640, 1200], 4 / 5, true);
   await yaz(`${R}/${s.detay}.png`, `${slug}-detay`, [640, 1200], 4 / 5, true);
+}
+// Giyim: özel tasarım klasöründeki çizimler (beton-obje/tasarim/giyim, `npm run cizim`); ana görsel ilk renk,
+// ikinci görsel öbür renk. Renkler korunur (Savana kamuflajı renkli), kenarlar siyaha söner.
+const GIYIM = process.env.GIYIM_KOK ?? 'C:/projects/beton-obje/tasarim/giyim/cizim';
+export const GIYIM_GORSEL = {
+  'bandana-boxer': ['bandana-boxer-kara', 'bandana-boxer-kemik'],
+  'bandana-sort': ['bandana-sort-kara', 'bandana-sort-kemik'],
+  'kamuflaj-boxer': ['kamuflaj-boxer-beton', 'kamuflaj-boxer-savana'],
+  'kamuflaj-sort': ['kamuflaj-sort-beton', 'kamuflaj-sort-savana'],
+  'muhur-boxer': ['muhur-boxer-kara', 'muhur-boxer-kemik'],
+  'muhur-sort': ['muhur-sort-kara', 'muhur-sort-beton'],
+};
+for (const [slug, [a, b]] of Object.entries(GIYIM_GORSEL)) {
+  await yaz(`${GIYIM}/${a}.webp`, `${slug}-ana`, [640, 1200], 4 / 5, true, true);
+  await yaz(`${GIYIM}/${b}.webp`, `${slug}-detay`, [640, 1200], 4 / 5, true, true);
 }
 if (existsSync(AMBLEM)) {
   for (const g of [256, 512, 1024]) {
