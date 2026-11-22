@@ -16,10 +16,10 @@ const koyuMu = (h) => {
   return 0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255) < 140;
 };
 const id = `o${Math.random().toString(36).slice(2, 8)}`;
-const zemin = yuzey === 'serpinti' ? '#34465A' : yuzey === 'grafit' ? '#55585A' : yuzey === 'renk' && renk ? renk : BEYAZ;
+const zemin = yuzey === 'serpinti' ? '#34465A' : yuzey === 'grafit' ? '#55585A' : yuzey === 'brut' ? '#74756F' : yuzey === 'kara' ? '#2A2C2F' : yuzey === 'renk' && renk ? renk : BEYAZ;
 const krom = yuzey === 'lansman';
-const izgara = yuzey === 'tuz' || yuzey === 'grafit' || krom || (yuzey === 'renk' && renk);
-const derz = yuzey === 'grafit' ? '#2E2F31' : krom ? '#1A1B1D' : zemin !== BEYAZ && koyuMu(zemin) ? ACIK_DERZ : KOYU_DERZ;
+const izgara = yuzey === 'tuz' || yuzey === 'grafit' || yuzey === 'brut' || yuzey === 'kara' || krom || (yuzey === 'renk' && renk);
+const derz = yuzey === 'grafit' ? '#2E2F31' : yuzey === 'brut' ? '#3B3C39' : yuzey === 'kara' ? '#D2D5D8' : krom ? '#1A1B1D' : zemin !== BEYAZ && koyuMu(zemin) ? ACIK_DERZ : KOYU_DERZ;
 ---
 <svg class="ornek" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
   <defs>

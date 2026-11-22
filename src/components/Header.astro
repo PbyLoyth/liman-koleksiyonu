@@ -3,10 +3,10 @@ import { yol } from '../data/yol.js';
 interface Props { ana?: boolean; ton?: 'koyu' | 'acik'; }
 const { ana = false, ton = 'koyu' } = Astro.props;
 const bolumler = [
+  ['Kampanya', '#kampanya'],
   ['Koleksiyon', '#koleksiyon'],
-  ['Masada', '#masada'],
-  ['Yüzeyler', '#yuzeyler'],
-  ['Hikâye', '#hikaye'],
+  ['Konseptler', '#konsept'],
+  ['Atölye', '#atolye'],
 ];
 ---
 <header class="ub" data-ub data-ton={ton} data-ana={ana ? '' : undefined}>
@@ -15,7 +15,7 @@ const bolumler = [
   </nav>
   <a class="ub-marka" href={yol('')} aria-label="Savana Season, ana sayfa">Savana Season</a>
   <div class="ub-sag">
-    <a class="ust ub-bag" href={yol('siparis/')}>Sipariş ve iade</a>
+    <a class="ust ub-bag" href={`${yol('')}#hikaye`}>Hikâye</a>
     <button class="ust ub-menu" type="button" aria-haspopup="dialog" aria-controls="menu" data-menu-ac>Menü</button>
   </div>
 </header>
@@ -29,9 +29,9 @@ const bolumler = [
     {bolumler.map(([ad, h], i) => (
       <a href={`${yol('')}${h}`}><span class="mono">0{i + 1}</span><span class="baslik">{ad}</span></a>
     ))}
-    <a href={yol('siparis/')}><span class="mono">05</span><span class="baslik">Sipariş</span></a>
+    <a href={`${yol('')}#hikaye`}><span class="mono">05</span><span class="baslik">Hikâye</span></a>
   </nav>
-  <p class="mono menu-alt">Elde dökülür · 14 gün iade</p>
+  <p class="mono menu-alt">Yalnız beton · Yalnız çelik</p>
 </dialog>
 
 <script>

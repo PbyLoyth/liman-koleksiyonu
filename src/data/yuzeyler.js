@@ -1,77 +1,60 @@
-// Sekiz yüzey. "renk" her ürünün kendine özgü rengidir (urunler.js > imza; iki ürün aynı renkte değil).
-// "lansman" bütün ürünlerde aynı: ayna gibi krom kaplama.
+// Yalnız beton ya da yalnız çelik (22 Kas kuralı). Beton: Brüt, Tuz, Grafit. Çelik: Ayna (krom gibi parlatılmış,
+// kararmış kazıma), Kara (karartılmış çelik, parlak kazıma). Kimlikler dönüş karelerinin klasör adları.
 export const palet = {
   'Tuz Beyazı': '#E4E1DA',
-  'Liman Grisi': '#8E918C',
-  Yosun: '#6E7959',
-  Pas: '#9A5A36',
-  Kömür: '#3A3C3B',
-  'Gece Mavisi': '#34465A',
   Grafit: '#55585A',
-  Şarap: '#5E2630',
-  'Gül Kurusu': '#B98C86',
-  Petrol: '#2E5B5E',
-  Hardal: '#B08A3A',
-  Kum: '#C9B79C',
-  'İşaret Kırmızısı': '#A3372B',
-  'Vitray Moru': '#5E4F72',
+  Brüt: '#74756F',
   Krom: '#B9BCC1',
+  Kara: '#2A2C2F',
 };
+
+export const malzemeler = [
+  { id: 'beton', ad: 'Beton' },
+  { id: 'celik', ad: 'Çelik' },
+];
 
 export const yuzeyler = [
   {
+    id: 'brut',
+    malzeme: 'beton',
+    ad: 'Brüt',
+    kisa: 'Ham gri beton',
+    metin: 'Kalıptan çıktığı gibi: gözenekli, mat, ham gri beton.',
+  },
+  {
     id: 'tuz',
+    malzeme: 'beton',
     ad: 'Tuz',
-    kisa: 'Beyaz beton, koyu derz',
-    metin: 'Koleksiyonun ilk hâli: beyaz beton, ince koyu derzler.',
-  },
-  {
-    id: 'renk',
-    ad: 'Renk',
-    kisa: 'Ürüne özgü renk',
-    metin: 'Her parçanın kendine özgü rengi; iki parça aynı renkte değil.',
-  },
-  {
-    id: 'lansman',
-    ad: 'Krom',
-    kisa: 'Lansman rengi: ayna gibi krom',
-    metin: 'Lansmana özel: ayna gibi krom kaplama, siyah derz. Bütün parçalarda aynı.',
-    lansman: true,
+    kisa: 'Beyaz beton',
+    metin: 'Beyaz çimentoyla dökülmüş beton, ince koyu derzler.',
   },
   {
     id: 'grafit',
+    malzeme: 'beton',
     ad: 'Grafit',
-    kisa: 'Koyu, lüks gri beton',
-    metin: 'Koyu, lüks gri beton: sıkı yüzey, hafif ipek parlaklık, ton ton derz.',
+    kisa: 'Koyu beton',
+    metin: 'Koyu, sıkı beton; hafif ipek parlaklık, ton ton derz.',
   },
   {
-    id: 'tuz-biber',
-    ad: 'Tuz-biber',
-    kisa: 'Beyaz, kömür benekli',
-    metin: 'Beyazın üstüne elde atılmış ince kömür benekler.',
+    id: 'lansman',
+    malzeme: 'celik',
+    ad: 'Ayna',
+    kisa: 'Parlatılmış çelik',
+    metin: 'Ayna gibi parlatılmış çelik; kazıma çizgileri kararmış.',
   },
   {
-    id: 'isaret',
-    ad: 'İşaret',
-    kisa: 'Beyaz, sinyal renkleri',
-    metin: 'Denizcilik sinyal bayraklarının kırmızısı, laciverti, sarısı ve siyahı; küçük damlalar hâlinde.',
-  },
-  {
-    id: 'serpinti',
-    ad: 'Serpinti',
-    kisa: 'Gece mavisi, beyaz köpük',
-    metin: 'Gece mavisi gövdeye dalgakırana vuran köpük gibi beyaz sıçrama.',
-  },
-  {
-    id: 'su-hatti',
-    ad: 'Su hattı',
-    kisa: 'Beyaz, tabanda pas bandı',
-    metin: 'Her parça aynı 9 mm çizgiye kadar pas rengine batırılmış gibi.',
+    id: 'kara',
+    malzeme: 'celik',
+    ad: 'Kara',
+    kisa: 'Karartılmış çelik',
+    metin: 'Karartılmış çelik; kazıma çizgileri parlak çelik olarak açılır.',
   },
 ];
 
 export const yuzeyBul = (id) => yuzeyler.find((y) => y.id === id);
 
-// Ürün sayfasında "Renk" yüzeyi ürünün imza rengiyle adlanır
-export const yuzeyAdi = (y, urun) => (y.id === 'renk' ? urun.imza.ad : y.ad);
-export const yuzeyKisa = (y, urun) => (y.id === 'renk' ? urun.imza.neden : y.kisa);
+export const yuzeyAdi = (y) => y?.ad ?? '';
+export const yuzeyKisa = (y) => y?.kisa ?? '';
+export const malzemeAdi = (y) => (y?.malzeme === 'celik' ? 'Çelik' : 'Beton');
+/** "Brüt beton", "Ayna çelik" */
+export const tamAd = (y) => (y ? `${y.ad} ${y.malzeme === 'celik' ? 'çelik' : 'beton'}` : '');

@@ -10,10 +10,8 @@ import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 
 const R = process.env.RENDER_KOK ?? 'C:/projects/beton-obje/tasarim/renderlar';
-const KAP = {
-  beyaz: 'tuz', palet: 'renk', lansman: 'lansman', grafit: 'grafit', tuzbiber: 'tuz-biber', isaret: 'isaret',
-  serpinti: 'serpinti', suhatti: 'su-hatti',
-};
+// Yalnız beton ve çelik (22 Kas kuralı); renkli boya yüzeyleri artık üretilmez
+const KAP = { beyaz: 'tuz', grafit: 'grafit', brut: 'brut', lansman: 'lansman', kara: 'kara' };
 const CEKIM = {
   payanda: ['aci', 'ust'], sapel: ['aci', 'ust'], kemer: ['aci', 'ust'], demet: ['aci', 'ust'], gul: ['aci', 'ust'],
   keson: ['aci', 'ust'], dalgakiran: ['aci', 'ust'], baba: ['aci', 'ust'], silo: ['aci', 'ust'], rihtim: ['aci', 'ust'],

@@ -4,8 +4,11 @@ export const site = {
   alt: 'beton objeler',
   baslik: 'Savana Season · beton objeler',
   aciklama:
-    'Elde dökülen beton objeler. Katedral ve Liman koleksiyonları; yedi yüzey, siparişle dökülür.',
+    'Yalnız beton, yalnız çelik: brütalist ve gotik objeler. Katedral ve Liman koleksiyonları, endüstriden konseptler.',
   url: 'https://pbyloyth.github.io/savana-season',
+
+  // Satış kapalı: site şimdilik neler yapabildiğimizi gösteren vitrin (fiyat ve sipariş düğmeleri gizli).
+  satis: false,
 
   // Sipariş penceresindeki düğmeler. Doldurulan her kanal bir düğme olur.
   siparis: {

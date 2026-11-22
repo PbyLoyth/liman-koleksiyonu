@@ -71,12 +71,12 @@ export const urunler = [
     rol: 'Vazo',
     fiyat: 890,
     kaynak: 'Demet ayak, ince sütunların birleşip tek ayak olduğu gotik taşıyıcıdır.',
-    metin: 'İçindeki cam tüp suyu tutar; beton suya değmez. Kuru ya da taze dal için.',
+    metin: 'Beton olanı kuru dal için; çelik olanı suyu doğrudan tutar.',
     imza: { ad: 'Yosun', neden: 'Eski taşı saran yosun' },
     ozellik: [
       ['Ölçü', 'Ø76 × 210 mm'],
       ['Ağırlık', 'Yaklaşık 880 g'],
-      ['Cam tüp', 'Ø25 mm, çıkarılabilir'],
+      ['Ağız', 'Ø27 mm'],
     ],
     gorsel: ['aci', 'ust'],
   },
@@ -92,7 +92,6 @@ export const urunler = [
     ozellik: [
       ['Ölçü', 'Ø130 × 18 mm'],
       ['Ağırlık', 'Yaklaşık 335 g'],
-      ['Altında', 'Keçe'],
     ],
     gorsel: ['aci', 'ust'],
   },
@@ -110,7 +109,6 @@ export const urunler = [
       ['Ölçü', '260 × 130 × 44 mm'],
       ['Ağırlık', 'Yaklaşık 1,25 kg'],
       ['Hücreler', 'Telefon (168 × 106 mm), kulaklık kutusu, yüzük ve bozuk para'],
-      ['Altında', 'Keçe'],
     ],
     gorsel: ['aci', 'ust'],
   },
@@ -176,7 +174,6 @@ export const urunler = [
       ['Ölçü', '200 × 42 × 28 mm'],
       ['Ağırlık', 'Yaklaşık 280 g'],
       ['Yuva', 'Çubuk tütsü, 25° eğik'],
-      ['Altında', 'Keçe'],
     ],
     uyari: 'Yanan tütsüyü yalnız bırakmayın.',
     gorsel: ['aci', 'ust'],
@@ -204,6 +201,7 @@ export const urunler = [
     rol: 'Masa lambası',
     fiyat: 2900,
     yakinda: true,
+    gizli: true, // opal cam başlık ve elektrik aksamı: yalnız beton / yalnız çelik kuralına uymuyor
     kaynak: 'Liman girişindeki mendirek feneri.',
     metin: 'Beton gövde, ışığı yumuşatan opal başlık. Elektrik aksamının uygunluk testleri bitince satışa çıkacak.',
     imza: { ad: 'İşaret Kırmızısı', neden: 'Liman girişindeki kırmızı fener' },
@@ -217,9 +215,9 @@ export const urunler = [
 ];
 
 export const ortak = [
-  ['Malzeme', 'Beyaz çimento esaslı beton; derzler çimento harcıyla elde doldurulur'],
+  ['Malzeme', 'Tek malzeme: ya beton ya çelik. Beton elde dökülür, derzleri harçla dolar; çelik kesilir, kaynaklanır, kazınır'],
   ['Bakım', 'Kuru ya da hafif nemli bezle silin'],
-  ['Not', 'Her parça elde dökülür; ton, gözenek ve sıçrama yerleri parçadan parçaya değişir'],
+  ['Not', 'Her parça elde yapılır; ton, gözenek ve kazıma izi parçadan parçaya değişir'],
 ];
 
 export const urunBul = (slug) => urunler.find((u) => u.slug === slug);

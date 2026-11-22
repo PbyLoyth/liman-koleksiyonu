@@ -6,7 +6,7 @@ import UrunKart from './UrunKart.astro';
 import SiparisPenceresi from './SiparisPenceresi.astro';
 import { site } from '../data/site.js';
 import { urunler, ortak, kod, koleksiyonAdi } from '../data/urunler.js';
-import { yuzeyler, yuzeyBul, yuzeyAdi, yuzeyKisa, palet } from '../data/yuzeyler.js';
+import { yuzeyler, yuzeyBul, yuzeyAdi, yuzeyKisa, malzemeler, tamAd } from '../data/yuzeyler.js';
 import {
   donusKok, ilkKare, masadaGorsel, sahneler, ogGorsel, cekildi, foto, fotoVar, cekimAdi, KARE,
 } from '../data/gorseller.js';
@@ -23,10 +23,12 @@ const kok = donusKok(u.slug, secili);
 const ilk = ilkKare(kok);
 const masada = masadaGorsel(u.slug);
 const sahne = sahneler[u.slug];
+const masadaUygun = masada && sahne && yuzeyBul(sahne.yuzey); // renkli eski sahneler gösterilmez
+const satis = site.satis;
 const CEKIMLER = ['aci', 'ust'];
 const fotolar = (yid) => Object.fromEntries(CEKIMLER.map((c) => [c, fotoVar(u.slug, yid, c) ? foto(u.slug, yid, c) : null]));
 const ilkFotolar = fotolar(secili);
-const etiket = (y) => (y.id === 'renk' ? `${yuzeyAdi(y, u)} · kendi rengi` : y.lansman ? `${y.ad} · lansman rengi` : y.ad);
+const etiket = (y) => tamAd(y);
 
 const veri = {
   ad: u.ad, rol: u.rol, fiyat: tl(u.fiyat), yakinda: !!u.yakinda, kanallar: site.siparis,
@@ -108,7 +110,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
           })}
         </div>
 
-        {masada && (
+        {masadaUygun && (
           <figure class="masada-kare foto">
             <Image
               src={masada}
@@ -118,7 +120,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
               alt={`${u.ad}, kullanımda: ${sahne?.sahne?.toLocaleLowerCase('tr-TR') ?? ''}`}
               loading="lazy"
             />
-            <figcaption class="mono">Masada · {sahne?.sahne} · {yuzeyAdi(yuzeyBul(sahne?.yuzey), u)}</figcaption>
+            <figcaption class="mono">Masada · {sahne?.sahne} · {tamAd(yuzeyBul(sahne?.yuzey))}</figcaption>
           </figure>
         )}
       </div>
@@ -134,37 +136,46 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
           <h1 class="baslik bilgi-ad">{u.ad}</h1>
           <div class="bilgi-alt">
             <p class="bilgi-rol">{u.rol}</p>
-            <p class="mono bilgi-fiyat">{tl(u.fiyat)}</p>
+            <p class="mono bilgi-fiyat">{satis ? tl(u.fiyat) : 'Beton · Çelik'}</p>
           </div>
 
           <div class="secim">
             <p class="secim-bas">
-              <span class="ust soluk">Yüzey</span>
+              <span class="ust soluk">Malzeme</span>
               <strong data-yuzey-ad>{etiket(Y)}</strong>
             </p>
-            <ul class="secim-liste">
-              {secenekler.map((y) => (
-                <li>
-                  <a
-                    class:list={['sw', y.lansman && 'sw-lansman']}
-                    href={urunYolu(u.slug, y.id)}
-                    data-yuzey={y.id}
-                    aria-label={etiket(y)}
-                    title={etiket(y)}
-                    aria-current={y.id === secili ? 'true' : undefined}
-                  >
-                    <Ornek yuzey={y.id} renk={y.id === 'renk' ? palet[u.imza.ad] : undefined} />
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div class="secim-gruplar">
+              {malzemeler.map((m) => {
+                const ys = secenekler.filter((y) => y.malzeme === m.id);
+                return ys.length > 0 && (
+                  <div class="secim-grup">
+                    <span class="mono soluk">{m.ad}</span>
+                    <ul class="secim-liste">
+                      {ys.map((y) => (
+                        <li>
+                          <a class="sw" href={urunYolu(u.slug, y.id)} data-yuzey={y.id} aria-label={etiket(y)} title={etiket(y)} aria-current={y.id === secili ? 'true' : undefined}>
+                            <Ornek yuzey={y.id} />
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
             <p class="secim-not soluk" data-yuzey-kisa>{yuzeyKisa(Y, u)}</p>
           </div>
 
-          <button class="dugme genis" type="button" data-siparis-ac data-ana-dugme>
-            {u.yakinda ? 'Çıkınca haber ver' : 'Sipariş ver'}
-          </button>
-          <p class="mono soluk guven">Siparişle dökülür · 14 gün iade · İade kargosu bizden</p>
+          {satis ? (
+            <Fragment>
+              <button class="dugme genis" type="button" data-siparis-ac data-ana-dugme>
+                {u.yakinda ? 'Çıkınca haber ver' : 'Sipariş ver'}
+              </button>
+              <p class="mono soluk guven">Siparişle dökülür · 14 gün iade · İade kargosu bizden</p>
+            </Fragment>
+          ) : (
+            <p class="mono soluk vitrin">Tek malzeme: betonda dökülür ya da çelikten kesilir.</p>
+          )}
 
           <div class="bilgi-metin">
             <p>{u.kaynak}</p>
@@ -195,7 +206,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
     </ul>
   </section>
 
-  <div class="alt-cubuk" data-alt-cubuk>
+  {satis && (<div class="alt-cubuk" data-alt-cubuk>
     <div class="alt-cubuk-ad">
       <strong>{u.ad}</strong>
       <span class="mono" data-cubuk-yuzey>{yuzeyAdi(Y, u)}</span>
@@ -203,9 +214,9 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
     <button class="dugme" type="button" data-siparis-ac>
       {u.yakinda ? 'Haber ver' : `Sipariş ver · ${tl(u.fiyat)}`}
     </button>
-  </div>
+  </div>)}
 
-  <SiparisPenceresi ad={u.ad} fiyat={tl(u.fiyat)} yakinda={u.yakinda} />
+  {satis && <SiparisPenceresi ad={u.ad} fiyat={tl(u.fiyat)} yakinda={u.yakinda} />}
   <script type="application/json" id="urun-veri" set:html={JSON.stringify(veri)} />
 </Base>
 
@@ -239,7 +250,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
   const ornekler = [...kok.querySelectorAll<HTMLAnchorElement>('.secim-liste .sw')];
   const adEl = kok.querySelector('[data-yuzey-ad]')!;
   const kisaEl = kok.querySelector('[data-yuzey-kisa]')!;
-  const cubukYuzey = document.querySelector('[data-cubuk-yuzey]')!;
+  const cubukYuzey = document.querySelector('[data-cubuk-yuzey]');
   const fotoKareleri = [...kok.querySelectorAll<HTMLElement>('[data-foto]')];
   function yuzeySec(id: string) {
     const y = veri.yuzeyler[id];
@@ -249,7 +260,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
     ornekler.forEach((a) => (a.dataset.yuzey === id ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
     adEl.textContent = y.etiket;
     kisaEl.textContent = y.kisa;
-    cubukYuzey.textContent = y.ad;
+    if (cubukYuzey) cubukYuzey.textContent = y.ad;
     document.title = id === 'tuz' ? `${veri.ad} · ${veri.rol} — Savana Season` : `${veri.ad} · ${y.ad} — Savana Season`;
     history.replaceState(null, '', y.yol);
     don.kokDegistir(y.kok);
@@ -272,12 +283,14 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
   );
 
   // Telefonda alt çubuk: ana sipariş düğmesi görünmüyorken çıkar
-  const cubuk = document.querySelector<HTMLElement>('[data-alt-cubuk]')!;
-  const ana = kok.querySelector<HTMLElement>('[data-ana-dugme]')!;
-  new IntersectionObserver(([g]) => cubuk.classList.toggle('acik', !g.isIntersecting && g.boundingClientRect.top < 0)).observe(ana);
+  const cubuk = document.querySelector<HTMLElement>('[data-alt-cubuk]');
+  const ana = kok.querySelector<HTMLElement>('[data-ana-dugme]');
+  if (cubuk && ana) new IntersectionObserver(([g]) => cubuk.classList.toggle('acik', !g.isIntersecting && g.boundingClientRect.top < 0)).observe(ana);
 
-  // Sipariş penceresi
-  const dlg = document.querySelector<HTMLDialogElement>('[data-siparis]')!;
+  // Sipariş penceresi (yalnız satış açıkken)
+  const dlg = document.querySelector<HTMLDialogElement>('[data-siparis]');
+  if (dlg) siparisKur(dlg);
+  function siparisKur(dlg: HTMLDialogElement) {
   const durum = dlg.querySelector<HTMLElement>('[data-sp-durum]')!;
   const metin = dlg.querySelector<HTMLTextAreaElement>('[data-sp-mesaj]')!;
   const mesaj = () => {
@@ -318,6 +331,7 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
   dlg.addEventListener('click', (e) => {
     if (e.target === dlg) dlg.close();
   });
+  }
 </script>
 
 <style>
@@ -374,7 +388,10 @@ const digerleri = [...sira.filter((d) => d.koleksiyon === u.koleksiyon), ...sira
   .bilgi-fiyat { font-size: 15px; }
   .secim-bas { display: flex; align-items: baseline; gap: 12px; }
   .secim-bas strong { font-weight: 620; font-size: 15px; }
-  .secim-liste { display: flex; flex-wrap: wrap; gap: 4px; margin-block: 10px 6px; }
+  .secim-gruplar { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-block: 10px 6px; }
+  .secim-grup { display: flex; align-items: center; gap: 8px; }
+  .secim-liste { display: flex; flex-wrap: wrap; gap: 2px; }
+  .vitrin { padding-top: 4px; }
   .sw {
     width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%;
     border: 1px solid transparent; transition: border-color .2s, transform .2s var(--hiz);

@@ -4,6 +4,7 @@
 import { donusKok, ilkKare, KARE } from '../data/gorseller.js';
 import { urunYolu, tl } from '../data/yol.js';
 import { kod } from '../data/urunler.js';
+import { site } from '../data/site.js';
 
 interface Props { u: any; yuzey?: string; sizes?: string; }
 const { u, yuzey = 'tuz', sizes = '(min-width: 1200px) 25vw, (min-width: 760px) 33vw, 50vw' } = Astro.props;
@@ -35,7 +36,7 @@ const ilk = ilkKare(kok);
     {u.yakinda ? <span class="mono kart-rozet">Yakında</span> : <span class="mono kart-ipucu" aria-hidden="true">360°</span>}
     <div class="kart-alt">
       <h3 class="kart-ad">{u.ad}</h3>
-      <p class="mono kart-fiyat">{u.yakinda ? '—' : tl(u.fiyat)}</p>
+      <p class="mono kart-fiyat">{site.satis ? (u.yakinda ? '—' : tl(u.fiyat)) : 'Beton · Çelik'}</p>
       <p class="kart-rol">{u.rol}</p>
     </div>
   </a>

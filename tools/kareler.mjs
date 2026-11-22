@@ -11,7 +11,8 @@ if (r.status !== 0) process.exit(r.status ?? 1);
 mkdirSync('public', { recursive: true });
 await new Promise((tamam, hata) => {
   const ssh = spawn('ssh', [UZAK, 'cd ~/projects/beton-obje/web && tar cf - donus og'], { stdio: ['ignore', 'pipe', 'inherit'] });
-  const tar = spawn('tar', ['-xf', '-', '-C', 'public'], { stdio: ['pipe', 'inherit', 'inherit'] });
+  // Gizli ürün (Fener: opal cam, kurala uymuyor) yayına girmez
+  const tar = spawn('tar', ['-xf', '-', '-C', 'public', '--exclude', 'donus/fener', '--exclude', 'og/fener-*'], { stdio: ['pipe', 'inherit', 'inherit'] });
   ssh.stdout.pipe(tar.stdin);
   tar.on('close', (k) => (k === 0 ? tamam() : hata(new Error(`tar çıkış ${k}`))));
   ssh.on('error', hata);

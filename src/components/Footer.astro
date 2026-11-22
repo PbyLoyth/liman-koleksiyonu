@@ -8,31 +8,32 @@ const kanalYok = !k.instagram && !k.whatsapp && !k.eposta;
   <div class="kap alt-ust">
     <div class="alt-blok alt-tanim">
       <p class="ust">Savana Season</p>
-      <p class="soluk">Elde dökülen beton objeler. Her parça siparişle, beyaz çimentodan dökülür.</p>
+      <p class="soluk">Yalnız beton, yalnız çelik. Brütalist ve gotik objeler; katedralden, limandan ve fabrikadan.</p>
     </div>
     <nav class="alt-blok" aria-label="Koleksiyon">
       <p class="ust">Koleksiyon</p>
       <a href={`${yol('')}#katedral`}>Katedral</a>
       <a href={`${yol('')}#liman`}>Liman</a>
-      <a href={`${yol('')}#yuzeyler`}>Yüzeyler</a>
+      <a href={`${yol('')}#yuzeyler`}>Malzeme</a>
     </nav>
-    <nav class="alt-blok" aria-label="Bilgi">
-      <p class="ust">Bilgi</p>
-      <a href={yol('siparis/')}>Sipariş ve iade</a>
-      <a href={yol('siparis/#gizlilik')}>Gizlilik</a>
+    <nav class="alt-blok" aria-label="Atölye">
+      <p class="ust">Atölye</p>
+      <a href={`${yol('')}#konsept`}>Konseptler</a>
+      <a href={`${yol('')}#atolye`}>Nasıl yapılır</a>
+      <a href={`${yol('')}#kampanya`}>Kampanya</a>
     </nav>
     <div class="alt-blok">
       <p class="ust">İletişim</p>
       {k.instagram && <a href={`https://instagram.com/${k.instagram}`} target="_blank" rel="noopener">Instagram</a>}
       {k.whatsapp && <a href={`https://wa.me/${k.whatsapp}`} target="_blank" rel="noopener">WhatsApp</a>}
       {k.eposta && <a href={`mailto:${k.eposta}`}>{k.eposta}</a>}
-      {kanalYok && <p class="soluk">Sipariş kanalı çok yakında.</p>}
+      {kanalYok && <p class="soluk">Çok yakında.</p>}
     </div>
   </div>
   <div class="alt-dev" aria-hidden="true"><span class="marka krom">Savana Season</span></div>
   <div class="kap alt-son mono">
     <span>© {new Date().getFullYear()} Savana Season</span>
-    <span>Elde dökülür · Beyaz çimento</span>
+    <span>Yalnız beton · Yalnız çelik</span>
   </div>
 </footer>
 

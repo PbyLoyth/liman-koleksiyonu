@@ -6,7 +6,7 @@ import { cekildi } from '../../../data/gorseller.js';
 
 // Her yüzeyin kendi adresi var: paylaşılan bağlantı o yüzeyin görseliyle açılır
 export function getStaticPaths() {
-  return urunler.flatMap((u) =>
+  return urunler.filter((u) => !u.gizli).flatMap((u) =>
     yuzeyler.filter((y) => y.id !== 'tuz' && cekildi(u.slug, y.id)).map((y) => ({ params: { slug: u.slug, yuzey: y.id }, props: { u, yuzey: y.id } })),
   );
 }
