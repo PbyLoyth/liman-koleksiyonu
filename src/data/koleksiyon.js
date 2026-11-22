@@ -24,7 +24,7 @@ export const manifesto = [
 export const muhur = {
   baslik: 'Mühür',
   metin: [
-    'Alevli haç Savana Season’ın mührü. Biçimi katedralin taş işçiliğinden gelir: dört eşit kol, her biri üç sivri uçla biter.',
+    'Alevli haç Savana Season’ın mührü: kararmış çelikten bir gotik haç. Kolları sivri uçla biter, her kolda zambak işlemesi, ortasında dövme bir kabara.',
     'Alev tutkudur. Çelik ateşte doğar; fikir de öyle. Haç sabırdır: taş taş örülen, yüzyıllarca ayakta kalan yapı.',
   ],
 };

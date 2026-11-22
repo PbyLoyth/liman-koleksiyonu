@@ -1,5 +1,5 @@
 ---
-// Üst şerit (Chrome Hearts düzeni): solda mühür (menüyü açar), ortada yazı logosu, sağda Vizyon.
+// Üst şerit (Chrome Hearts düzeni): solda beyaz haç simgesi (menüyü açar), ortada yazı logosu, sağda Vizyon.
 // saydam: ana sayfada giriş videosunun üstünde saydam ve büyük durur; aşağı kayınca siyaha döner ve küçülür.
 import Amblem from './Amblem.astro';
 import { marka, koleksiyonlar } from '../data/koleksiyon.js';
@@ -9,7 +9,7 @@ const { saydam = false } = Astro.props;
 ---
 <header class:list={['ust', { saydam }]} data-ust>
   <button class="ust-muhur" type="button" aria-label="Menüyü aç" aria-haspopup="dialog" aria-controls="menu" data-menu-ac>
-    <Amblem kor />
+    <Amblem />
   </button>
   <a class="marka ust-marka" href={yol('')} aria-label="Savana Season, ana sayfa">Savana Season</a>
   <nav class="ust-sag" aria-label="Sayfalar">
@@ -19,7 +19,7 @@ const { saydam = false } = Astro.props;
 
 <dialog class="menu" id="menu" aria-label="Menü">
   <div class="menu-ust">
-    <span class="menu-muhur"><Amblem kor /></span>
+    <span class="menu-muhur"><Amblem /></span>
     <span class="marka menu-marka" aria-hidden="true">Savana Season</span>
     <button class="harf menu-kapat" type="button" data-menu-kapat>Kapat</button>
   </div>
@@ -70,7 +70,6 @@ const { saydam = false } = Astro.props;
   .ust.saydam.dolu::before { opacity: 0; }
 
   .ust-muhur { justify-self: start; display: grid; place-items: center; width: 40px; height: 40px; margin-left: -8px; font-size: 24px; color: var(--yazi); }
-  .ust-muhur:hover :global(.kor::before) { animation-duration: 1.6s; }
   .ust-marka { font-size: 34px; white-space: nowrap; transition: transform .5s var(--yavas); }
   .ust.saydam:not(.dolu) .ust-marka { transform: scale(1.32); }
   .ust-sag { justify-self: end; }

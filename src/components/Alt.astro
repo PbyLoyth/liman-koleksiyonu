@@ -1,5 +1,5 @@
 ---
-// Alt bilgi: mühür (alevli haç), tutku cümlesi, malzeme kuralı, bağlantılar
+// Alt bilgi: mühür (kara-beyaz alevli haç), tutku cümlesi, malzeme kuralı, bağlantılar
 import Amblem from './Amblem.astro';
 import { marka, koleksiyonlar } from '../data/koleksiyon.js';
 import { yol, var_ } from '../data/gorsel.js';
@@ -8,7 +8,7 @@ const muhur = var_('amblem', 512);
 <footer class="alt kap">
   {muhur
     ? <img class="alt-muhur" src={yol('g/amblem-256.webp')} srcset={`${yol('g/amblem-256.webp')} 1x, ${yol('g/amblem-512.webp')} 2x`} width="112" height="112" alt="" aria-hidden="true" loading="lazy" decoding="async" />
-    : <span class="alt-muhur alt-vektor"><Amblem kor /></span>}
+    : <span class="alt-muhur alt-vektor"><Amblem /></span>}
   <p class="alt-tutku ekran">{marka.tutku}</p>
   <p class="harf soluk">{marka.slogan}</p>
   <nav class="alt-yollar" aria-label="Alt bağlantılar">

@@ -1,6 +1,6 @@
 // Görselleri hazırlar: npm run gorseller → public/g/<ad>-<genişlik>.webp ve public/og.jpg
 // Kaynak: UMUTMASA'daki görsel hattı (renderlar/vizyon, atölye için renderlar/konsept, Fener ve V2 için renderlar/tur5).
-// Her ürünün iki "ana" denemesinden SECIM'deki seçilir; hepsi tam kara-beyaza çevrilir. Mühür renkli kalır.
+// Her ürünün iki "ana" denemesinden SECIM'deki seçilir; hepsi tam kara-beyaza çevrilir.
 import sharp from 'sharp';
 import { existsSync, mkdirSync, readdirSync } from 'node:fs';
 
@@ -17,8 +17,8 @@ export const ESKI = {
   'keson-v2': { ana: 'tur6/v2-keson-g75-7402', detay: 'tur8/v2-keson-detay-s857-9302' },
   'rihtim-v2': { ana: 'tur8/v2-rihtim-s857-9101', detay: 'tur8/v2-rihtim-detay-s857-9301' },
 };
-// Mühür: alevli haç (tools/muhur.mjs); sitedeki tek renk ateştir, bu yüzden renkli kalır
-const AMBLEM = `${R}/tur8/muhur-son-a.png`;
+// Mühür: Umut'un seçtiği kara-beyaz alevli haç (renderlar/tur5, ilk görsel turu)
+const AMBLEM = `${R}/tur5/amblem-sb-5012.png`;
 
 // Seçilen ana deneme (tohumun son hanesi: 1 ya da 2); yazılmayan ürün için 1
 export const SECIM = {
