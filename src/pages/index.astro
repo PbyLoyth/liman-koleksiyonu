@@ -1,7 +1,7 @@
 ---
 import Taban from '../layouts/Taban.astro';
-import Kart from '../components/Kart.astro';
-import { marka, koleksiyonlar, urunler } from '../data/koleksiyon.js';
+import KoleksiyonKart from '../components/KoleksiyonKart.astro';
+import { marka, koleksiyonlar } from '../data/koleksiyon.js';
 import { genis, yol, var_, dosyaVar } from '../data/gorsel.js';
 
 // Giriş: tam ekran, yavaş bir film döngüsü (Chrome Hearts düzeni). Önce afiş görseli görünür, video hazır olunca
@@ -26,19 +26,13 @@ const video = dosyaVar('g/giris-yatay.mp4');
     <a class="kaydir harf" href="#koleksiyon"><span>Kaydır</span><i aria-hidden="true"></i></a>
   </section>
 
-  <section class="kap" id="koleksiyon" aria-label="Koleksiyon">
+  <section class="kap" id="koleksiyon" aria-label="Koleksiyonlar" data-koleksiyon-kok={yol('koleksiyon/')} data-idler={koleksiyonlar.map((k) => k.id).join(' ')}>
     <h2 class="giris-satir ekran">{marka.tutku}</h2>
     <p class="harf soluk ortali">{marka.koleksiyon} — {marka.slogan}</p>
-    <nav class="suzgec" aria-label="Koleksiyon süzgeci">
-      <button type="button" class="harf" data-suz="hepsi" aria-pressed="true">Hepsi</button>
-      {koleksiyonlar.map((k) => <button type="button" class="harf" data-suz={k.id} aria-pressed="false">{k.ad}</button>)}
-    </nav>
-    <p class="satir soluk" data-satir aria-live="polite">{urunler.filter((u) => u.koleksiyon !== 'giyim').length} nesne · {urunler.filter((u) => u.koleksiyon === 'giyim').length} giyim · üç kaynak</p>
-    <ul class="izgara" data-izgara>
-      {urunler.map((u) => <Kart u={u} />)}
+    <ul class="kk-izgara girisler">
+      {koleksiyonlar.map((k) => <KoleksiyonKart k={k} />)}
     </ul>
   </section>
-  <script type="application/json" id="satirlar" set:html={JSON.stringify(Object.fromEntries(koleksiyonlar.map((k) => [k.id, k.satir])))} />
 </Taban>
 
 <script>
@@ -62,29 +56,10 @@ const video = dosyaVar('g/giris-yatay.mp4');
     dikeyEkran.addEventListener('change', yukle);
   }
 
-  // Süzgeç: Hepsi / Katedral / Liman / Fabrika; menüdeki #katedral gibi bağlantılar da süzer
-  const dugmeler = [...document.querySelectorAll<HTMLButtonElement>('[data-suz]')];
-  const kartlar = [...document.querySelectorAll<HTMLElement>('[data-k]')];
-  const satir = document.querySelector<HTMLElement>('[data-satir]')!;
-  const ilkSatir = satir.textContent;
-  const satirlar = JSON.parse(document.getElementById('satirlar')!.textContent!);
-  function suz(id: string, kaydir = false) {
-    if (!dugmeler.some((d) => d.dataset.suz === id)) id = 'hepsi';
-    dugmeler.forEach((d) => d.setAttribute('aria-pressed', String(d.dataset.suz === id)));
-    kartlar.forEach((k) => (k.hidden = id !== 'hepsi' && k.dataset.k !== id));
-    satir.textContent = id === 'hepsi' ? ilkSatir : satirlar[id];
-    if (kaydir) document.querySelector('.suzgec')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-  dugmeler.forEach((d) =>
-    d.addEventListener('click', () => {
-      const id = d.dataset.suz!;
-      history.replaceState(null, '', id === 'hepsi' ? location.pathname : `#${id}`);
-      suz(id);
-    }),
-  );
-  const hash = () => location.hash.slice(1);
-  if (hash()) suz(hash(), true);
-  addEventListener('hashchange', () => suz(hash(), true));
+  // Koleksiyonlar artık kendi sayfalarında; eski bağlantılar (/#katedral) oraya gider
+  const bolum = document.querySelector<HTMLElement>('[data-koleksiyon-kok]')!;
+  const eski = location.hash.slice(1);
+  if (bolum.dataset.idler!.split(' ').includes(eski)) location.replace(`${bolum.dataset.koleksiyonKok}${eski}/`);
 </script>
 
 <style>
@@ -113,13 +88,6 @@ const video = dosyaVar('g/giris-yatay.mp4');
   .giris-satir { text-align: center; padding-top: clamp(72px, 9vw, 128px); }
   .giris-satir { font-size: clamp(30px, 4vw, 56px); }
   .ortali { text-align: center; margin-top: 14px; }
-  .suzgec {
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 30px;
-    padding-top: clamp(48px, 6vw, 80px); scroll-margin-top: calc(var(--ust) + 8px);
-  }
-  .suzgec button { color: var(--soluk); padding-bottom: 4px; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
-  .suzgec button:hover { color: var(--yazi); }
-  .suzgec button[aria-pressed='true'] { color: var(--yazi); border-color: var(--yazi); }
-  .satir { text-align: center; font-size: 13px; padding: 14px 0 clamp(36px, 5vw, 64px); }
+  .girisler { padding-top: clamp(48px, 6vw, 88px); }
   @media (prefers-reduced-motion: reduce) { .kaydir i::after, .giris-afis img { animation: none; transform: none; } }
 </style>

@@ -24,8 +24,7 @@ const { saydam = false } = Astro.props;
     <button class="harf menu-kapat" type="button" data-menu-kapat>Kapat</button>
   </div>
   <nav class="menu-yollar" aria-label="Menü">
-    <a href={`${yol('')}#koleksiyon`}>Bütün nesneler</a>
-    {koleksiyonlar.map((k) => <a href={`${yol('')}#${k.id}`}>{k.ad}</a>)}
+    {koleksiyonlar.map((k) => <a href={yol(`koleksiyon/${k.id}/`)}>{k.ad}</a>)}
     <a href={yol('vizyon/')}>Vizyon</a>
   </nav>
   <p class="harf soluk menu-alt">{marka.tutku}</p>

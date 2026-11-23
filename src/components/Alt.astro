@@ -12,7 +12,7 @@ const muhur = var_('amblem', 512);
   <p class="alt-tutku ekran">{marka.tutku}</p>
   <p class="harf soluk">{marka.slogan}</p>
   <nav class="alt-yollar" aria-label="Alt bağlantılar">
-    {koleksiyonlar.map((k) => <a class="harf" href={`${yol('')}#${k.id}`}>{k.ad}</a>)}
+    {koleksiyonlar.map((k) => <a class="harf" href={yol(`koleksiyon/${k.id}/`)}>{k.ad}</a>)}
     <a class="harf" href={yol('vizyon/')}>Vizyon</a>
   </nav>
   <p class="alt-not soluk">© {new Date().getFullYear()} {marka.ad} · {marka.koleksiyon}. Nesneler henüz üretimde değil. <a class="alt-arsiv" href={yol('arsiv/')}>Arşiv</a></p>

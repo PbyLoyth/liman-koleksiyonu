@@ -1,0 +1,43 @@
+---
+// Koleksiyon sayfası: her koleksiyon kendi sayfasında (Katedral, Liman, Fabrika, Giyim); ana sayfada yalnız girişleri var.
+import Taban from '../../layouts/Taban.astro';
+import Kart from '../../components/Kart.astro';
+import KoleksiyonKart from '../../components/KoleksiyonKart.astro';
+import { marka, koleksiyonlar, urunler } from '../../data/koleksiyon.js';
+import { yol } from '../../data/gorsel.js';
+
+export function getStaticPaths() {
+  return koleksiyonlar.map((k) => ({ params: { id: k.id }, props: { k } }));
+}
+const { k } = Astro.props;
+const liste = urunler.filter((u) => u.koleksiyon === k.id);
+const digerleri = koleksiyonlar.filter((x) => x.id !== k.id);
+const birim = k.tur === 'giyim' ? 'parça' : 'nesne';
+---
+<Taban baslik={`${k.ad} — ${marka.ad}`} aciklama={`${k.ad}. ${k.metin}`} gorsel={yol(`g/${k.gorsel}-1536.webp`)}>
+  <header class="kap kb">
+    <p class="harf soluk">{marka.koleksiyon}</p>
+    <h1 class="ekran kb-ad">{k.ad}</h1>
+    <p class="kb-satir">{k.satir}</p>
+    <p class="soluk kb-metin">{k.metin}</p>
+    <p class="harf soluk">{liste.length} {birim}</p>
+  </header>
+
+  <section class="kap" aria-label={`${k.ad}: ${liste.length} ${birim}`}>
+    <ul class="izgara">{liste.map((u) => <Kart u={u} />)}</ul>
+  </section>
+
+  <nav class="kap diger" aria-labelledby="diger-bas">
+    <h2 id="diger-bas" class="harf">Öbür koleksiyonlar</h2>
+    <ul class="kk-izgara uclu">{digerleri.map((x) => <KoleksiyonKart k={x} kucuk />)}</ul>
+  </nav>
+</Taban>
+
+<style>
+  .kb { display: grid; justify-items: center; gap: 12px; text-align: center; padding-block: clamp(56px, 8vw, 112px) clamp(44px, 5vw, 72px); }
+  .kb-ad { font-size: clamp(46px, 6.4vw, 96px); margin-top: 4px; }
+  .kb-satir { font-size: clamp(17px, 1.6vw, 21px); }
+  .kb-metin { max-width: 58ch; font-size: 15px; margin-bottom: 6px; }
+  .diger { padding-top: clamp(96px, 12vw, 168px); }
+  .diger h2 { text-align: center; margin-bottom: 40px; }
+</style>

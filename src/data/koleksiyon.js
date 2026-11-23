@@ -56,7 +56,8 @@ export const koleksiyonlar = [
     ad: 'Giyim',
     tur: 'giyim',
     satir: 'Sade, ağır, imzalı.',
-    metin: 'Boxer ve şorttan motokros formasına ve arazi kaskına: sade kesimler, ağır kumaşlar. İmza hep aynı: Old English Savana Season ve haç.',
+    metin: 'Boxer ve şort: sade kesimler, ağır kumaşlar. İmza hep aynı: Old English Savana Season ve haç.',
+    gorsel: 'kampanya-giyim',
   },
 ];
 
@@ -132,10 +133,6 @@ export const urunler = [
     metin: 'Düz renk. Belde ortada tek Old English yazı, bacakta küçük haç nakışı.' },
   { slug: 'muhur-sort', ad: 'Mühür Şort', koleksiyon: 'giyim', rol: 'Şort', malzeme: 'Yıkanmış kot', renkler: 'Kara · Beton',
     metin: 'Geniş kesim yıkanmış kot: beş cep, perçin, marangoz halkası ve D-halka. Uylukta dikişli deri haç yama.' },
-  { slug: 'moto-forma', ad: 'Moto Forma', koleksiyon: 'giyim', rol: 'Forma', malzeme: 'Nefes alan polyester', renkler: 'Kara · Kemik',
-    metin: 'Motokros kesimi. Omuz paneli göğüste gotik bir uçla biter, ortasında yanan haç. Kollarda dikey Old English yazı, file yanlar, uzun arka etek.' },
-  { slug: 'arazi-kaski', ad: 'Arazi Kaskı', koleksiyon: 'giyim', rol: 'Kask', malzeme: 'Kompozit', malzemeAd: 'Kabuk', renkler: 'Kara · Kemik',
-    metin: 'Düz kabuk, kara siperlik ve çene, çenede çelik file. Yanda haç, siperlikte Old English yazı.' },
 ];
 
 export const koleksiyonBul = (id) => koleksiyonlar.find((k) => k.id === id);

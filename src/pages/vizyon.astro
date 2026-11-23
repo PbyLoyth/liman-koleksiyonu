@@ -37,7 +37,7 @@ const muhurFoto = var_('amblem', 1024);
         const n = urunler.filter((u) => u.koleksiyon === k.id).length;
         return (
           <li>
-            <a href={`${yol('')}#${k.id}`}>
+            <a href={yol(`koleksiyon/${k.id}/`)}>
               <figure class="kaynak-gorsel"><img src={g.src} srcset={g.srcset} sizes="(min-width: 900px) 32vw, 100vw" width="1536" height="864" alt={`${k.ad}: ${k.satir}`} loading="lazy" decoding="async" /></figure>
               <h3 class="harf">{k.ad} <span class="soluk">· {n} nesne</span></h3>
               <p class="satir">{k.satir}</p>
@@ -83,7 +83,7 @@ const muhurFoto = var_('amblem', 1024);
     <h2 id="durum-bas" class="harf ortali">Durum</h2>
     <p>Bu bir konsept koleksiyon: fikir, yön ve tutku. Nesneler henüz üretimde değil.</p>
     <p class="soluk">Sıradaki adım ilk kalıplar ve ilk çelik kesimleri. Hangi nesnenin önce döküleceğini bu koleksiyon belirleyecek.</p>
-    <a class="harf geri" href={yol('')}>← Bütün nesneler</a>
+    <a class="harf geri" href={`${yol('')}#koleksiyon`}>← Koleksiyonlar</a>
   </section>
 </Taban>
 

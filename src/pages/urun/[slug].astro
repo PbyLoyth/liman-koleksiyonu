@@ -27,7 +27,7 @@ const renk2 = (u.renkler ?? '').split(' · ')[1];
     </div>
     <div class="bilgi">
       <div class="yapiskan">
-        <a class="harf soluk" href={`${yol('')}#${k.id}`}>{k.ad}</a>
+        <a class="harf soluk" href={yol(`koleksiyon/${k.id}/`)}>{k.ad}</a>
         <h1 class="urun-ad">{u.ad}</h1>
         <p class="soluk">{u.rol} · {u.malzeme}</p>
         <p class="metin">{u.metin}</p>
@@ -39,7 +39,7 @@ const renk2 = (u.renkler ?? '').split(' · ')[1];
             : <div><dt class="harf soluk">Malzeme</dt><dd>{u.malzeme}. Tek malzeme, boya ve kaplama yok.</dd></div>}
           <div><dt class="harf soluk">Durum</dt><dd>Konsept. Henüz üretimde değil.</dd></div>
         </dl>
-        <a class="harf geri" href={yol('')}>← Bütün nesneler</a>
+        <a class="harf geri" href={yol(`koleksiyon/${k.id}/`)}>← {k.ad}</a>
       </div>
     </div>
   </article>

@@ -1,0 +1,31 @@
+---
+// Koleksiyon girişi: geniş görsel, ad, tek satır ve parça sayısı. Ana sayfada ve koleksiyon sayfalarının altında.
+import { genis, yol } from '../data/gorsel.js';
+import { urunler } from '../data/koleksiyon.js';
+interface Props { k: any; kucuk?: boolean; }
+const { k, kucuk = false } = Astro.props;
+const g = genis(k.gorsel);
+const n = urunler.filter((u) => u.koleksiyon === k.id).length;
+const sizes = kucuk ? '(min-width: 720px) 32vw, 100vw' : '(min-width: 720px) 49vw, 100vw';
+---
+<li class:list={['kk', { kucuk }]}>
+  <a href={yol(`koleksiyon/${k.id}/`)}>
+    <div class="kk-gorsel">
+      <img src={g.src} srcset={g.srcset} sizes={sizes} width="1536" height="960" alt="" loading="lazy" decoding="async" />
+    </div>
+    <h3 class="ekran kk-ad">{k.ad}</h3>
+    <p class="soluk kk-satir">{k.satir}<span class="harf">{n} {k.tur === 'giyim' ? 'parça' : 'nesne'}</span></p>
+  </a>
+</li>
+
+<style>
+  .kk a { display: grid; gap: 8px; text-align: center; }
+  .kk-gorsel { aspect-ratio: 16 / 10; overflow: hidden; background: #0b0b0b; margin-bottom: 14px; }
+  .kk-gorsel img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--yavas); }
+  @media (hover: hover) { .kk a:hover img { transform: scale(1.03); } }
+  .kk-ad { font-size: clamp(24px, 2.4vw, 34px); }
+  .kucuk .kk-ad { font-size: clamp(18px, 1.6vw, 22px); }
+  .kk-satir { font-size: 14px; }
+  .kk-satir .harf { margin-left: 10px; }
+  @media (prefers-reduced-motion: reduce) { .kk-gorsel img { transition: none; } }
+</style>

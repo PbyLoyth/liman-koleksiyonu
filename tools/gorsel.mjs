@@ -76,8 +76,6 @@ export const GIYIM_GORSEL = {
   'kamuflaj-sort': ['kamuflaj-sort-savana', 'kamuflaj-sort-beton'],
   'muhur-boxer': ['muhur-boxer-kara', 'muhur-boxer-kemik'],
   'muhur-sort': ['muhur-sort-kara', 'muhur-sort-beton'],
-  'moto-forma': ['moto-forma-kara', 'moto-forma-kemik'],
-  'arazi-kaski': ['arazi-kaski-kara', 'arazi-kaski-kemik'],
 };
 for (const [slug, [a, b]] of Object.entries(GIYIM_GORSEL)) {
   await yaz(`${GIYIM}/${a}.webp`, `${slug}-ana`, [640, 1200], 4 / 5, false, true);
